@@ -1,12 +1,13 @@
 Requirements
 ------------
 
-This module requires the lastest version of the current Drupal CVS version.
+This module requires the lastest version of the current Drupal CVS version.  Drupal 4.4.0 
+will not work because of changes to the menu system.
 
 Installation
 ------------
 
-1. Copy the collimator.module to the Drupal modules/ directory.
+1. Copy the site_map.module to the Drupal modules/ directory.
 
 2. Go to "administer" -> "modules" and enable the module.
 
