@@ -93,20 +93,18 @@ function _site_map_page() {
 function theme_site_map_menu_tree($item = 1) {
   $menu = menu_get_menu();
 
-  foreach ($menu['items'][$item]['children'] as $child) {
-    if (_site_map_menu_item_is_visible($child)) {
-      $output .= theme('site_map_menu_item', $child);
-    }
+  foreach ($menu['visible'][$item]['children'] as $child) {
+    $output .= theme('site_map_menu_item', $child);
   }
 
   if ($output) {
-    $output .= '<div class="tree"><ul>'."\n".$output."</ul>\n</div>\n";
+    $output = '<div class="tree"><ul>'."\n".$output."</ul>\n</div>\n";
 
-    if ($menu['items'][$item]['title']) {
-      $output .= '<div class="name">'.$menu['items'][$item]['title']."</div>\n".$output;
+    if ($menu['visible'][$item]['title']) {
+      $output = '<div class="name">'.$menu['visible'][$item]['title']."</div>\n".$output;
     }
 
-    $output .= '<div class="site_map">'.$output."</div>\n";
+    $output = '<div class="site_map">'.$output."</div>\n";
   }
 
   return $output;
@@ -122,14 +120,12 @@ function theme_site_map_menu_item($item) {
   $menu = menu_get_menu();
 
   $output = '<li>';
-  $output .= l($menu['items'][$item]['title'], $menu['items'][$item]['path']);
+  $output .= l($menu['visible'][$item]['title'], $menu['visible'][$item]['path']);
 
-  if ($menu['items'][$item]['children']) {
+  if ($menu['visible'][$item]['children']) {
     $output .= '<ul>';
-    foreach ($menu['items'][$item]['children'] as $child) {
-      if (_site_map_menu_item_is_visible($child)) {
-        $output .= theme('site_map_menu_item', $child);
-      }
+    foreach ($menu['visible'][$item]['children'] as $child) {
+      $output .= theme('site_map_menu_item', $child);
     }
     $output .= "</ul>\n";
   }
@@ -203,31 +199,4 @@ function theme_site_map_taxonomy_tree(&$tree, $show_count, $name = NULL, $descri
   return '<div class="site_map">'.$output.'</div>';
 }
 
-/**
- * Determine a menu item is visible.
- *
- * @param $id The ID of a menu item
- * @return bool TRUE if visible, FALSE if invisible for some reason
- */
-function _site_map_menu_item_is_visible($id) {
-  $_menu = menu_get_menu();
-  $type = $_menu['items'][$id]['type'];
-  
-  if (!_menu_item_is_accessible($id)) {
-    return FALSE;
-  }
-  if ( (($type & MENU_VISIBLE_IN_TREE) == MENU_VISIBLE_IN_TREE) ||
-       (($type & MENU_IS_ROOT) == MENU_IS_ROOT) ) {
-    if (($type & MENU_VISIBLE_IF_HAS_CHILDREN) == MENU_VISIBLE_IF_HAS_CHILDREN) {
-      foreach ($_menu['items'][$id]['children'] as $child) {
-        if (ivy_menu_item_is_visible($child)) {
-          return TRUE;
-        }
-      }
-      return FALSE; // no visible children
-    }
-    return TRUE;
-  }
-  return FALSE;
-}
 ?>
