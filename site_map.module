@@ -58,7 +58,7 @@ function site_map_menu() {
  */
 function _site_map_page() {
   //
-  // Vocabulary and menu trees are compiled and passed to theme_site_map_tree()
+  // Vocabulary and menu trees are compiled and passed to theme functions
   // individually.
   //
 
@@ -77,10 +77,8 @@ function _site_map_page() {
   $result = db_query('SELECT vid,name,description FROM {vocabulary}');
   while ($t = db_fetch_object($result)) {
     $tree = taxonomy_get_tree($t->vid);
-    if (variable_get('site_map_show_count', 1)) {
-      $output .= theme_site_map_menu_tree(1);
-    }
-    $output .= theme_site_map_taxonomy_tree($tree, $t->name, $t->description);
+
+    $output .= theme_site_map_taxonomy_tree($tree, variable_get('site_map_show_count', 1), $t->name, $t->description);
   }
 
   print theme('page', $output);
@@ -141,24 +139,62 @@ function theme_site_map_menu_item($item) {
  * Themeable site map trees, called by _site_map_page(), to render taxonomy trees.
  *
  * @param $tree The results of taxonomy_get_tree() with optional 'count' fields.
+ * @param $show_count Enabled node count if set.
  * @param $name An optional name for the tree. (Default: NULL)
  * @param $description An optional description of the tree. (Default: NULL)
  * @return A string representing a rendered tree.
  */
-function theme_site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
+function theme_site_map_taxonomy_tree(&$tree, $show_count, $name = NULL, $description = NULL) {
   $name && $output = '<div class="name">'.$name.'</div>';
   $description && $output .= '<div class="description">'.$description.'</div>';
 
-  $output .= '<div class="tree"><ul>';
+  $last_depth = -1;
+  $output .= '<div class="tree">';
   foreach ($tree as $term) {
-    $output .= '<li>';
-    $output .= _taxonomy_depth($term->depth, "&nbsp;")."&middot;". l(check_output($term->name), "taxonomy/page/or/". $term->tid, array("title" => $term->description));
+    //
+    // Adjust the depth of the <ul> based on the change
+    // in $term->depth since the $last_depth.
+    //
+    if ($term->depth > $last_depth) {
+      for ($i = 0; $i < ($term->depth - $last_depth); $i++) {
+        $output .= '<ul>';
+      }
+    }
+    else if ($term->depth < $last_depth) {
+      for ($i = 0; $i < ($last_depth - $term->depth); $i++) {
+        $output .= '</ul>';
+      }
+    }
 
-    if ($term->count) {
-      $output .= " ($count)</li>\n";
+    //
+    // Display the $term.  If $term->count exists, show the count too.
+    //
+    $output .= '<li>';
+    $output .= l(check_output($term->name), "taxonomy/page/or/". $term->tid, array("title" => $term->description));
+    
+    if ($show_count) {
+      $count = taxonomy_term_count_nodes($term->tid);
+      $output .= " ($count)\n";
+    }
+
+    $output .= "</li>\n";
+
+    //
+    // Reset $last_depth in preparation for the next $term.
+    //
+    $last_depth = $term->depth;
+  }
+
+  //
+  // Bring the depth back to where it began, -1.
+  //
+  if ($last_depth > -1) {
+    for ($i = 0; $i < ($last_depth + 1); $i++) {
+      $output .= '</ul>';
     }
   }
-  $output .= "</ul>\n</div>\n";
+
+  $output .= "</div>\n";
 
   return '<div class="site_map">'.$output.'</div>';
 }
