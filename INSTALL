@@ -10,9 +10,18 @@ Installation
 
 2. Go to "administer" -> "modules" and enable the module.
 
-2. Check the "administer" -> "users" -> "configure" -> "permissions" page to enable use of this module.
+3. Check the "administer" -> "users" -> "configure" -> "permissions" page to enable use of this module.
+
+4. Make sure the menu item is enabled in "administer" -> "menus".
+
+5. Visit http://yoursite.com/sitemap.
 
 Author
 ------
 
 Nic Ivy (http://njivy.org)
+
+Last updated
+------------
+
+$Id$
