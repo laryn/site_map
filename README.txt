@@ -1,5 +1,5 @@
 Overview of site_map.module
---------------------------------------
+---------------------------
 
 This module provides a page that lists links to all categories--i.e. 
 taxonomy terms--and optionally the fully expanded Navigation menu.  
@@ -11,6 +11,6 @@ Author
 
 Nic Ivy (http://njivy.org)
 
-README version
---------------
+README.txt version
+------------------
 $Id$
