@@ -93,19 +93,23 @@ function _site_map_page() {
 function theme_site_map_menu_tree($item = 1) {
   $menu = menu_get_menu();
 
-  if ($menu['items'][$item]['title']) {
-    $output .= '<div class="name">'.$menu['items'][$item]['title'].'</div>';
-  }
-
-  $output .= '<div class="tree"><ul>';
   foreach ($menu['items'][$item]['children'] as $child) {
     if (_site_map_menu_item_is_visible($child)) {
       $output .= theme('site_map_menu_item', $child);
     }
   }
-  $output .= "</ul>\n</div>\n";
 
-  return '<div class="site_map">'.$output."</div>\n";
+  if ($output) {
+    $output .= '<div class="tree"><ul>'."\n".$output."</ul>\n</div>\n";
+
+    if ($menu['items'][$item]['title']) {
+      $output .= '<div class="name">'.$menu['items'][$item]['title']."</div>\n".$output;
+    }
+
+    $output .= '<div class="site_map">'.$output."</div>\n";
+  }
+
+  return $output;
 }
 
 /**
