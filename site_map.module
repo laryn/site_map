@@ -1,0 +1,193 @@
+<?php
+// $Id$
+
+/**
+ * hook_help() implementation
+ */
+function site_map_help($section = 'admin/help#site_map') {
+  $output = '';
+
+  switch ($section) {
+
+    case 'admin/modules#description':  // Displayed in admin/system/modules where modules are enabled/disabled
+      $output = t('Display a site map.');
+      break;
+    case 'sitemap':
+      $output = variable_get('site_map_message', '');
+      break;
+
+  }
+
+  return $output;
+}
+
+/**
+ * hook_perm() implementation
+ */
+function site_map_perm() {
+  return array("access site map", "administer site map");
+}
+
+/**
+ * hook_settings() implementation
+ */
+function site_map_settings() {
+  $output .= form_textarea(t('Site map message'), 'site_map_message', variable_get('site_map_message', ''), 60, 10, t('Define a message to be displayed above the site map.'));
+  $output .= form_checkbox(t('Show node counts by categories'), 'site_map_show_count', 1, variable_get('site_map_show_count', 1), t('When enabled, this option will show the number of nodes in each taxonomy term.'));
+  $output .= form_checkbox(t('Include navigation menus'), 'site_map_show_nav_menus', 1, variable_get('site_map_show_nave_menus', 1), t('When enabled, this option will include the fully-expanded top-level navigation menus in the site map'));
+
+  return $output;
+}
+
+/**
+ * hook_menu() implementation
+ */
+function site_map_menu() {
+   $items[] = array(
+     'path' => 'sitemap',
+     'title' => t('site map'),
+     'callback' => '_site_map_page',
+     'access' => (user_access('access site map') || user_access('administer site map'))
+    );
+
+  return $items;
+}
+
+/**
+ * The site map
+ */
+function _site_map_page() {
+  //
+  // Vocabulary and menu trees are compiled and passed to theme_site_map_tree()
+  // individually.
+  //
+
+  if (variable_get('site_map_show_nav_menus', 1)) {
+    //
+    // Compile the menu trees.
+    // All the defined items in the 'Navigation' tree will be rendered. The items
+    // must be visible, of course.
+    //
+    $output .= theme_site_map_menu_tree(1);
+  }
+
+  //
+  // Compile the vocabulary trees.
+  //
+  $result = db_query('SELECT vid,name,description FROM {vocabulary}');
+  while ($t = db_fetch_object($result)) {
+    $tree = taxonomy_get_tree($t->vid);
+    if (variable_get('site_map_show_count', 1)) {
+      $output .= theme_site_map_menu_tree(1);
+    }
+    $output .= theme_site_map_taxonomy_tree($tree, $t->name, $t->description);
+  }
+
+  print theme('page', $output);
+}
+
+/**
+ * Themeable site map trees, called by _site_map_page(), to render a menu tree.
+ *
+ * @param $menu The item from menu_get_menu() that should be rendered.
+ * @return A string representing a rendered tree.
+ */
+function theme_site_map_menu_tree($item = 1) {
+  $menu = menu_get_menu();
+
+  if ($menu['items'][$item]['title']) {
+    $output .= '<div class="name">'.$menu['items'][$item]['title'].'</div>';
+  }
+
+  $output .= '<div class="tree"><ul>';
+  foreach ($menu['items'][$item]['children'] as $child) {
+    if (_site_map_menu_item_is_visible($child)) {
+      $output .= theme_site_map_menu_item($child);
+    }
+  }
+  $output .= "</ul>\n</div>\n";
+
+  return '<div class="site_map">'.$output."</div>\n";
+}
+
+/**
+ * Themeable site map trees, called by _site_map_page(), to render menu items.
+ *
+ * @param $menu The item from menu_get_menu() that should be rendered.
+ * @return A string representing a rendered tree.
+ */
+function theme_site_map_menu_item($item) {
+  $menu = menu_get_menu();
+
+  $output = '<li>';
+  $output .= l($menu['items'][$item]['title'], $menu['items'][$item]['path']);
+
+  if ($menu['items'][$item]['children']) {
+    $output .= '<ul>';
+    foreach ($menu['items'][$item]['children'] as $child) {
+      if (_site_map_menu_item_is_visible($child)) {
+        $output .= theme_site_map_menu_item($child);
+      }
+    }
+    $output .= "</ul>\n";
+  }
+
+  $output .= "</li>\n";
+
+  return $output;
+}
+
+/**
+ * Themeable site map trees, called by _site_map_page(), to render taxonomy trees.
+ *
+ * @param $tree The results of taxonomy_get_tree() with optional 'count' fields.
+ * @param $name An optional name for the tree. (Default: NULL)
+ * @param $description An optional description of the tree. (Default: NULL)
+ * @return A string representing a rendered tree.
+ */
+function theme_site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
+  $name && $output = '<div class="name">'.$name.'</div>';
+  $description && $output .= '<div class="description">'.$description.'</div>';
+
+  $output .= '<div class="tree"><ul>';
+  foreach ($tree as $term) {
+    $output .= '<li>';
+    $output .= _taxonomy_depth($term->depth, "&nbsp;")."&middot;". l(check_output($term->name), "taxonomy/page/or/". $term->tid, array("title" => $term->description));
+
+    if ($term->count) {
+      $output .= " ($count)</li>\n";
+    }
+  }
+  $output .= "</ul>\n</div>\n";
+
+  return '<div class="site_map">'.$output.'</div>';
+}
+
+/**
+ * Determine a menu item is visible.
+ *
+ * @param $id The ID of a menu item
+ * @return bool TRUE if visible, FALSE if invisible for some reason
+ */
+function _site_map_menu_item_is_visible($id) {
+  $_menu = menu_get_menu();
+  $type = $_menu['items'][$id]['type'];
+  
+  if (!_menu_item_is_accessible($id)) {
+    return FALSE;
+  }
+  if ( (($type & MENU_VISIBLE_IN_TREE) == MENU_VISIBLE_IN_TREE) ||
+       (($type & MENU_IS_ROOT) == MENU_IS_ROOT) ) {
+    if (($type & MENU_VISIBLE_IF_HAS_CHILDREN) == MENU_VISIBLE_IF_HAS_CHILDREN) {
+      foreach ($_menu['items'][$id]['children'] as $child) {
+        if (ivy_menu_item_is_visible($child)) {
+          return TRUE;
+        }
+      }
+      return FALSE; // no visible children
+    }
+    return TRUE;
+  }
+  return FALSE;
+}
+?>

@@ -1,0 +1,18 @@
+Requirements
+------------
+
+This module requires the lastest version of the current Drupal CVS version.
+
+Installation
+------------
+
+1. Copy the collimator.module to the Drupal modules/ directory.
+
+2. Go to "administer" -> "modules" and enable the module.
+
+2. Check the "administer" -> "users" -> "configure" -> "permissions" page to enable use of this module.
+
+Author
+------
+
+Nic Ivy (http://njivy.org)
