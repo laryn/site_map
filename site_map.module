@@ -68,7 +68,7 @@ function _site_map_page() {
     // All the defined items in the 'Navigation' tree will be rendered. The items
     // must be visible, of course.
     //
-    $output .= theme_site_map_menu_tree(1);
+    $output .= theme('site_map_menu_tree', 1);
   }
 
   //
@@ -78,7 +78,7 @@ function _site_map_page() {
   while ($t = db_fetch_object($result)) {
     $tree = taxonomy_get_tree($t->vid);
 
-    $output .= theme_site_map_taxonomy_tree($tree, variable_get('site_map_show_count', 1), $t->name, $t->description);
+    $output .= theme('site_map_taxonomy_tree', $tree, variable_get('site_map_show_count', 1), $t->name, $t->description);
   }
 
   print theme('page', $output);
@@ -100,7 +100,7 @@ function theme_site_map_menu_tree($item = 1) {
   $output .= '<div class="tree"><ul>';
   foreach ($menu['items'][$item]['children'] as $child) {
     if (_site_map_menu_item_is_visible($child)) {
-      $output .= theme_site_map_menu_item($child);
+      $output .= theme('site_map_menu_item', $child);
     }
   }
   $output .= "</ul>\n</div>\n";
@@ -124,7 +124,7 @@ function theme_site_map_menu_item($item) {
     $output .= '<ul>';
     foreach ($menu['items'][$item]['children'] as $child) {
       if (_site_map_menu_item_is_visible($child)) {
-        $output .= theme_site_map_menu_item($child);
+        $output .= theme('site_map_menu_item', $child);
       }
     }
     $output .= "</ul>\n";
