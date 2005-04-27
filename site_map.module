@@ -69,86 +69,31 @@ function site_map_menu() {
  */
 function _site_map_page() {
   //
-  // Vocabulary and menu trees are compiled and passed to theme functions
-  // individually.
-  //
-
-  if (variable_get('site_map_show_nav_menus', 1)) {
-    //
-    // Compile the menu trees.
-    // All the defined items in the 'Navigation' tree will be rendered. The items
-    // must be visible, of course.
-    //
-    $output .= theme('site_map_menu_tree', 1);
-  }
-
-  //
   // Compile the vocabulary trees.
   //
+  print theme('page', _site_map_render());
+}
+
+/**
+ * This function can be called from blocks or pages as desired.
+ */
+function _site_map_render() {
   $vids = variable_get('site_map_show_vocabularies', array('0'));
   $result = db_query('SELECT vid,name,description FROM {vocabulary} WHERE vid IN (%s) ORDER BY weight ASC, name', implode(',', $vids));
   while ($t = db_fetch_object($result)) {
+    //
+    // taxonomy_get_tree() honors access controls
+    //
     $tree = taxonomy_get_tree($t->vid);
 
-    $output .= theme('site_map_taxonomy_tree', $tree, variable_get('site_map_show_count', 1), $t->name, $t->description);
-  }
-
-  print theme('page', $output);
-}
-
-/**
- * Themeable site map trees, called by _site_map_page(), to render a menu tree.
- *
- * @param $menu The item from menu_get_menu() that should be rendered.
- * @return A string representing a rendered tree.
- */
-function theme_site_map_menu_tree($item = 1) {
-  $menu = menu_get_menu();
-
-  foreach ($menu['visible'][$item]['children'] as $child) {
-    $output .= theme('site_map_menu_item', $child);
-  }
-
-  if ($output) {
-    $output = '<div class="tree"><ul>'."\n$output\n</ul></div>\n";
-
-    if ($menu['visible'][$item]['title']) {
-      $output = '<div class="name">'.$menu['visible'][$item]['title']."</div>\n".$output;
-    }
-
-    $output = '<div class="site_map">'.$output."</div>\n";
+    $output .= _site_map_taxonomy_tree($tree, variable_get('site_map_show_count', 1), $t->name, $t->description);
   }
 
   return $output;
 }
 
 /**
- * Themeable site map trees, called by _site_map_page(), to render menu items.
- *
- * @param $menu The item from menu_get_menu() that should be rendered.
- * @return A string representing a rendered tree.
- */
-function theme_site_map_menu_item($item) {
-  $menu = menu_get_menu();
-
-  $output = '<li>';
-  $output .= l($menu['visible'][$item]['title'], $menu['visible'][$item]['path']);
-
-  if ($menu['visible'][$item]['children']) {
-    $output .= '<ul>';
-    foreach ($menu['visible'][$item]['children'] as $child) {
-      $output .= theme('site_map_menu_item', $child);
-    }
-    $output .= "</ul>\n";
-  }
-
-  $output .= "</li>\n";
-
-  return $output;
-}
-
-/**
- * Themeable site map trees, called by _site_map_page(), to render taxonomy trees.
+ * Render taxonomy tree
  *
  * @param $tree The results of taxonomy_get_tree() with optional 'count' fields.
  * @param $show_count Enabled node count if set.
@@ -156,7 +101,7 @@ function theme_site_map_menu_item($item) {
  * @param $description An optional description of the tree. (Default: NULL)
  * @return A string representing a rendered tree.
  */
-function theme_site_map_taxonomy_tree(&$tree, $show_count, $name = NULL, $description = NULL) {
+function _site_map_taxonomy_tree(&$tree, $show_count, $name = NULL, $description = NULL) {
   $name && $output = '<div class="name">'.$name.'</div>';
   $description && $output .= '<div class="description">'.$description.'</div>';
 
@@ -190,9 +135,9 @@ function theme_site_map_taxonomy_tree(&$tree, $show_count, $name = NULL, $descri
     // Display the $term.  If $term->count exists, show the count too.
     //
     $output .= '<li>';
-    $output .= l(drupal_specialchars($term->name), 'taxonomy/term/'. $term->tid, array('title' => $term->description));
+    $output .= l(check_plain($term->name), 'taxonomy/term/'. $term->tid, array('title' => $term->description));
     if ($show_rss_links) {
-      $output = $output . ' (' . l(t('RSS'), "taxonomy/term/{$term->tid}/{$rss_depth}/feed") . ')';
+      $output = $output . ' <span class="rss">' . l(t('RSS'), "taxonomy/term/{$term->tid}/{$rss_depth}/feed") . '</span>';
     }
     
     if ($show_count) {
