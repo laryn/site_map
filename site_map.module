@@ -248,13 +248,14 @@ function _site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
 }
 
 function _site_map_menu_tree() {
-  $output = '';
-  $menu = menu_get_menu();
-  $menus = variable_get('site_map_show_menus', array());
-  foreach ($menus as $mid) {
-    $title = $menu['visible'][$mid]['title'];
-    $menu_display = theme('site_map_menu_tree', $mid, $menu);
-    $output .= theme('box', $title, $menu_display);
+  if ($menus = variable_get('site_map_show_menus', array())) {
+    $output = '';
+    $menu = menu_get_menu();
+    foreach ($menus as $mid) {
+      $title = $menu['visible'][$mid]['title'];
+      $menu_display = theme('site_map_menu_tree', $mid, $menu);
+      $output .= theme('box', $title, $menu_display);
+    }
   }
 
   return $output;
