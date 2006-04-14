@@ -1,16 +1,33 @@
-Overview of site_map.module
----------------------------
+Drupal site map module:
+----------------------
+Original author - Nic Ivy http://njivy.org
+Author - Fredrik Jonsson fredrik at combonet dot se
+Requires - Drupal 4.6
+License - GPL (see LICENSE)
 
-This module provides a page that lists links to all categories--i.e. 
-taxonomy terms--and optionally the fully expanded Navigation menu.  
-The site admin may optionally define a message to be displayed at the 
-top of the page and display node counters alongside the category links.
 
-Author
-------
+Overview:
+--------
+This module provides a page that can act as a map of links to the site. Administrators choose what should be displays, the options are as follows.
 
-Nic Ivy (http://njivy.org)
+* A message to be displayed at the top of the page
+* The latest blogs.
+* All books, only title.
+* Any menu, including the navigation menu. It will be displaud fully expanded.
+* Any categories, i.e vocabalary, with all the terms expanded. Optionally with node counts and RSS feeds.
 
-README.txt version
-------------------
+Support for menus was contributed by keve. Blogs, books and layout changes by frjo. The rest is by the original author.
+
+Installation:
+------------
+1. Copy the site_map directory to the Drupal modules/ directory.
+2. Go to "administer" -> "modules" and enable the module.
+3. Check the "administer" -> "access control" page to enable use of
+   this module to different roles.
+4. Make sure the menu item is enabled in "administer" -> "menus".
+5. Visit http://example.com/sitemap.
+
+
+Last updated:
+------------
 $Id$
