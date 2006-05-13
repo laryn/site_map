@@ -2,21 +2,26 @@ Drupal site map module:
 ----------------------
 Original author - Nic Ivy http://njivy.org
 Author - Fredrik Jonsson fredrik at combonet dot se
-Requires - Drupal 4.6
+Requires - Drupal 4.7
 License - GPL (see LICENSE)
 
 
 Overview:
 --------
-This module provides a page that can act as a map of links to the site. Administrators choose what should be displays, the options are as follows.
+Provides a site map, a page that can act as a map page that can act as a
+map of links to the site. Administrators choose what should be displays,
+the options are as follows.
 
 * A message to be displayed at the top of the page
 * The latest blogs.
 * All books, only title.
-* Any menu, including the navigation menu. It will be displaud fully expanded.
-* Any categories, i.e vocabalary, with all the terms expanded. Optionally with node counts and RSS feeds.
+* Any menu, including the navigation menu.
+  It will be displayd fully expanded.
+* Any categories, i.e vocabalary, with all the terms expanded.
+  Optionally with node counts and RSS feeds.
 
-Support for menus was contributed by keve. Blogs, books and layout changes by frjo. The rest is by the original author.
+Support for menus was contributed by keve. Blogs, books and layout
+changes by frjo. The rest is by the original author.
 
 Installation:
 ------------
