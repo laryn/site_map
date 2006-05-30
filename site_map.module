@@ -170,7 +170,7 @@ function site_map_page() {
 
 function _site_map_front_page() {
   $title = t('Front page');
-  $output = l(t("Front page of %sn", array ("%sn" => variable_get("site_name", "Drupal"))), './') .' '. l(t('RSS'), 'node/feed', array('class' => 'rss'));
+  $output = l(t("Front page of %sn", array ("%sn" => variable_get("site_name", "Drupal"))), './') .' '. l(t('RSS'), 'node/feed', array('class' => 'rss', 'title' => 'Syndicate content'));
   $output = theme('box', $title, $output);
 
   return $output;
@@ -184,13 +184,13 @@ function _site_map_blogs() {
   $output = '<div class="description">'. t("Community blog and recent blog authors at <i>%sn</i>.", array ("%sn" => variable_get("site_name", "Drupal"))) .'</div>';
 
   $blogs = array();
-  $blogs[] .= l(t('All blogs'), 'blog') .' '. l(t('RSS'), 'blog/feed', array('class' => 'rss'));
-  $result = db_query_range("SELECT DISTINCT(u.uid), u.name 
-    FROM {users} u 
-    INNER JOIN {node} n ON u.uid = n.uid 
-    WHERE n.type = 'blog' AND n.status = 1", 0, 10);
+  $blogs[] .= l(t('All blogs'), 'blog') .' '. l(t('RSS'), 'blog/feed', array('class' => 'rss', 'title' => 'Syndicate content'));
+  $result = db_query_range("SELECT DISTINCT n.uid, u.name 
+    FROM {node} n 
+    INNER JOIN {users} u ON n.uid = u.uid 
+    WHERE n.type = 'blog' AND n.status = 1 ORDER BY n.created ASC", 0, 10);
   while ($account = db_fetch_object($result)) {
-    $blogs[] = l(t("%s's blog", array ("%s" => $account->name)), "blog/$account->uid") .' '. l(t('RSS'), "blog/$account->uid/feed", array('class' => 'rss'));
+    $blogs[] = l(t("%s's blog", array ("%s" => $account->name)), "blog/$account->uid") .' '. l(t('RSS'), "blog/$account->uid/feed", array('class' => 'rss', 'title' => 'Syndicate content'));
   }
   $output .= theme('item_list', $blogs);
   $output = theme('box', $title, $output);
@@ -256,6 +256,7 @@ function _site_map_menu_tree($pid = 1, $menu = NULL) {
   return $output;
 }
 
+
 /**
  * This function can be called from blocks or pages as desired.
  */
@@ -264,9 +265,7 @@ function _site_map_taxonomy() {
     $result = db_query('SELECT vid, name, description 
       FROM {vocabulary} WHERE vid IN (%s) ORDER BY weight ASC, name', implode(',', $vids));
     while ($t = db_fetch_object($result)) {
-      // taxonomy_get_tree() honors access controls
-      $tree = taxonomy_get_tree($t->vid);
-      $output .= _site_map_taxonomy_tree($tree, $t->name, $t->description);
+      $output .= _site_map_taxonomy_tree($t->vid, $t->name, $t->description);
     }
   }
 
@@ -281,7 +280,7 @@ function _site_map_taxonomy() {
  * @param $description An optional description of the tree. (Default: NULL)
  * @return A string representing a rendered tree.
  */
-function _site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
+function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   $title = $name ? $name : '';
   $last_depth = -1;
   $rss_depth = variable_get('site_map_rss_depth', 'all');
@@ -296,6 +295,8 @@ function _site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
   $output = $description ? '<div class="description">'. $description. '</div>' : '';
   $output .= '<div class="tree">';
 
+  // taxonomy_get_tree() honors access controls
+  $tree = taxonomy_get_tree($vid);
   foreach ($tree as $term) {
     // Adjust the depth of the <ul> based on the change
     // in $term->depth since the $last_depth.
@@ -311,13 +312,18 @@ function _site_map_taxonomy_tree(&$tree, $name = NULL, $description = NULL) {
     }
     // Display the $term.
     $output .= '<li>';
-    $output .= l(check_plain($term->name), "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description), NULL, NULL, FALSE, TRUE);
+    $term->count = taxonomy_term_count_nodes($term->tid);
+    if ($term->count){
+      $output .= l($term->name, "taxonomy/term/$term->tid", array('title' => $term->description));
+    }
+    else {
+       $output .= check_plain($term->name);
+    }
     if (variable_get('site_map_show_count', 1)) {
-      $count = taxonomy_term_count_nodes($term->tid);
-      $output .= " ($count)";
+      $output .= " ($term->count)";
     }
     if (variable_get('site_map_show_rss_links', 1)) {
-      $output .= ' '. l(t('RSS'), "taxonomy/term/$term->tid/$rss_depth/feed", array('class' => 'rss'));
+      $output .= ' '. l(t('RSS'), "taxonomy/term/$term->tid/$rss_depth/feed", array('class' => 'rss', 'title' => 'Syndicate content'));
     }
     $output .= "</li>\n";
     // Reset $last_depth in preparation for the next $term.
