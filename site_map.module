@@ -157,10 +157,10 @@ function site_map_page() {
   }
 
   // Compile the menu trees.
-  $output .= _site_map_menu();
+  $output .= _site_map_menus();
 
   // Compile the vocabulary trees.
-  $output .= _site_map_taxonomy();
+  $output .= _site_map_taxonomys();
 
   $output = '<div class="site_map">'. $output .'</div>';
 
@@ -185,10 +185,10 @@ function _site_map_blogs() {
 
   $blogs = array();
   $blogs[] .= l(t('All blogs'), 'blog') .' '. l(t('RSS'), 'blog/feed', array('class' => 'rss', 'title' => 'Syndicate content'));
-  $result = db_query_range("SELECT DISTINCT n.uid, u.name 
-    FROM {node} n 
-    INNER JOIN {users} u ON n.uid = u.uid 
-    WHERE n.type = 'blog' AND n.status = 1 ORDER BY n.created ASC", 0, 10);
+  $result = db_query_range("SELECT u.uid, u.name 
+    FROM {users} u 
+    INNER JOIN {node} n ON u.uid = n.uid 
+    WHERE n.type = 'blog' AND n.status = 1 GROUP BY u.uid ORDER BY n.created ASC", 0, 10);
   while ($account = db_fetch_object($result)) {
     $blogs[] = l(t("%s's blog", array ("%s" => $account->name)), "blog/$account->uid") .' '. l(t('RSS'), "blog/$account->uid/feed", array('class' => 'rss', 'title' => 'Syndicate content'));
   }
@@ -213,10 +213,10 @@ function _site_map_books() {
     ORDER BY b.weight, n.title'));
   while ($page = db_fetch_object($result)) {
     // Load the node:
-    $node = node_load(array('nid' => $page->nid));
+    $node = node_load($page->nid);
     if ($node) {
       // Take the most recent approved revision, extract the page and check output:
-      $node = book_content($node, TRUE);
+      //$node = book_content($node, TRUE);
       // Output the content:
       $books[] = l($node->title, 'node/'. $node->nid);
     }
@@ -230,7 +230,7 @@ function _site_map_books() {
 /**
  * Render menus
  */
-function _site_map_menu() {
+function _site_map_menus() {
   if ($mid = variable_get('site_map_show_menus', 0)) {
     $menu = menu_get_menu();
     $title = $menu['visible'][$mid]['title'];
@@ -260,7 +260,7 @@ function _site_map_menu_tree($pid = 1, $menu = NULL) {
 /**
  * This function can be called from blocks or pages as desired.
  */
-function _site_map_taxonomy() {
+function _site_map_taxonomys() {
   if ($vids = variable_get('site_map_show_vocabularies', array())) {
     $result = db_query('SELECT vid, name, description 
       FROM {vocabulary} WHERE vid IN (%s) ORDER BY weight ASC, name', implode(',', $vids));
