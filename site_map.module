@@ -192,7 +192,7 @@ function theme_site_map_display() {
 
 function _site_map_front_page() {
   $title = t('Front page');
-  $output = l(t("Front page of %sn", array ("%sn" => variable_get("site_name", "Drupal"))), NULL) . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'rss.xml', array('class' => 'rss', 'title' => 'Syndicate content')) : '');
+  $output = l(t("Front page of %sn", array ("%sn" => variable_get('site_name', 'Drupal'))), NULL) . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'rss.xml', array('class' => 'rss', 'title' => t('Syndicate content'))) : '');
   $output = theme('box', $title, $output);
 
   return $output;
@@ -202,20 +202,22 @@ function _site_map_front_page() {
  * Render the latest blog authors
  */
 function _site_map_blogs() {
-  $title = t('Blogs');
-  $output = '<div class="description">'. t("Community blog and recent blog authors at <i>%sn</i>.", array ("%sn" => variable_get("site_name", "Drupal"))) .'</div>';
+  if (module_exist('blog')) {
+    $title = t('Blogs');
+    $output = '<div class="description">'. t("Community blog and recent blog authors at <i>%sn</i>.", array ("%sn" => variable_get('site_name', 'Drupal'))) .'</div>';
 
-  $blogs = array();
-  $blogs[] .= l(t('All blogs'), 'blog') . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'blog/feed', array('class' => 'rss', 'title' => 'Syndicate content')) : '');
-  $result = db_query_range("SELECT DISTINCT u.uid, u.name 
-    FROM {users} u 
-    INNER JOIN {node} n ON u.uid = n.uid 
-    WHERE n.type = 'blog' AND n.status = 1 ORDER BY n.created DESC", 0, 10);
-  while ($account = db_fetch_object($result)) {
-    $blogs[] = l(t("%s's blog", array ("%s" => $account->name)), "blog/$account->uid") . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), "blog/$account->uid/feed", array('class' => 'rss', 'title' => 'Syndicate content')) : '');
+    $blogs = array();
+    $blogs[] .= l(t('All blogs'), 'blog') . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'blog/feed', array('class' => 'rss', 'title' => t('Syndicate content'))) : '');
+    $result = db_query_range("SELECT DISTINCT u.uid, u.name 
+      FROM {users} u 
+      INNER JOIN {node} n ON u.uid = n.uid 
+      WHERE n.type = 'blog' AND n.status = 1 ORDER BY n.created DESC", 0, 10);
+    while ($account = db_fetch_object($result)) {
+      $blogs[] = l(t("%s's blog", array ("%s" => $account->name)), "blog/$account->uid") . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), "blog/$account->uid/feed", array('class' => 'rss', 'title' => t('Syndicate content'))) : '');
+    }
+    $output .= theme('item_list', $blogs);
+    $output = theme('box', $title, $output);
   }
-  $output .= theme('item_list', $blogs);
-  $output = theme('box', $title, $output);
 
   return $output;
 }
@@ -226,7 +228,7 @@ function _site_map_blogs() {
 function _site_map_books() {
   if (module_exist('book') && $nids = variable_get('site_map_show_books', array())) {
     $title = t('Books');
-    $description = '<div class="description">'. t("Books at <i>%sn</i>.", array ("%sn" => variable_get("site_name", "Drupal"))) .'</div>';
+    $description = '<div class="description">'. t("Books at <i>%sn</i>.", array ("%sn" => variable_get('site_name', 'Drupal'))) .'</div>';
     $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n INNER JOIN {book} b ON n.vid = b.vid WHERE b.parent = 0 AND n.status = 1 AND n.moderate = 0 AND n.nid IN (%s) ORDER BY b.weight, n.title'), implode(',', $nids));
     while ($node = db_fetch_object($result)) {
       $book_display .= '<h3>'. l($node->title, 'node/'. $node->nid) .'</h3>';
@@ -337,7 +339,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $output .= " ($term->count)";
     }
     if (variable_get('site_map_show_rss_links', 1)) {
-      $output .= ' '. l(t('RSS'), "taxonomy/term/$term->tid/$rss_depth/feed", array('class' => 'rss', 'title' => 'Syndicate content'));
+      $output .= ' '. l(t('RSS'), "taxonomy/term/$term->tid/$rss_depth/feed", array('class' => 'rss', 'title' => t('Syndicate content')));
     }
     $output .= "</li>\n";
     // Reset $last_depth in preparation for the next $term.
