@@ -348,9 +348,9 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
 
   $output = $description ? '<div class="description">'. check_plain($description) .'</div>' : '';
 
-  if ($name == 'Forum' && module_exist('views')) {
-  $output .= '<p>'. l(t('Forum page'), 'forum') . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'tracker/forum/feed', array('class' => 'rss', 'title' => t('Syndicate content'))) . (module_exist('commentrss') ? ' '. l(t('C-RSS'), 'crss/vocab/'. $vid, array('class' => 'rss', 'title' => t('Syndicate comments'))) : '') : '') .'</p>';
-  }
+/*   if ($name == 'Forum' && module_exist('views')) { */
+/*     $output .= '<p>'. l(t('Forum page'), 'forum') . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'tracker/forum/feed', array('class' => 'rss', 'title' => t('Syndicate content'))) . (module_exist('commentrss') ? ' '. l(t('C-RSS'), 'crss/vocab/'. $vid, array('class' => 'rss', 'title' => t('Syndicate comments'))) : '') : '') .'</p>'; */
+/*   } */
 
   $output .= '<div class="tree">';
 
