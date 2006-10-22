@@ -77,8 +77,10 @@ function site_map_settings() {
     '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
   $vocab_options = array();
-  foreach (taxonomy_get_vocabularies() as $vocabulary) {
-    $vocab_options[$vocabulary->vid] = $vocabulary->name;
+  if (module_exist('taxonomy') {
+    foreach (taxonomy_get_vocabularies() as $vocabulary) {
+      $vocab_options[$vocabulary->vid] = $vocabulary->name;
+    }
   }
   //$vocab_options[0] = t('<none>');
   $form['site_map_content']['site_map_show_vocabularies'] = array(
@@ -152,14 +154,15 @@ function site_map_menu($may_cache) {
       'title' => t('site map'),
       'callback' => 'site_map_page',
       'access' => user_access('access site map'),
-      'type' => MENU_SUGGESTED_ITEM);
+      'type' => MENU_SUGGESTED_ITEM
+    );
   }
 
   return $items;
 }
 
 /**
- * Menu callback; The site map
+ * Menu callback for the site map.
  */
 function site_map_page() {
   // Set css file
@@ -175,9 +178,9 @@ function theme_site_map_display() {
   $output = '';
 
   if (variable_get('site_map_show_rss_links', 1)) {
-    $output .= '<p>'. t('This is a link to a content RSS feed') .' <span class="rss">'. t('RSS') .'</span>';
+    $output .= '<p><span class="rss">'. t('RSS') .'</span> '. t('This is a link to a content RSS feed');
     if (module_exist('commentrss')) {
-      $output .= '<br />'. t('This is a link to a comment RSS feed') .' <span class="rss">'. t('C-RSS') .'</span>';
+      $output .= '<br /><span class="rss">'. t('C-RSS') .'</span>'. t('This is a link to a comment RSS feed');
     }
     $output .= '</p>';
   }
@@ -224,7 +227,7 @@ function _site_map_blogs() {
 
     $blogs = array();
     $blogs[] .= l(t('All blogs'), 'blog') . (variable_get('site_map_show_rss_links', 1) ? ' '. l(t('RSS'), 'blog/feed', array('class' => 'rss', 'title' => t('Syndicate content'))) : '');
-    $result = db_query_range("SELECT DISTINCT u.uid, u.name 
+    $result = db_query_range("SELECT DISTINCT u.uid, u.name, n.created 
       FROM {users} u 
       INNER JOIN {node} n ON u.uid = n.uid 
       WHERE n.type = 'blog' AND n.status = 1 ORDER BY n.created DESC", 0, 10);
@@ -316,7 +319,7 @@ function _site_map_menu_tree($pid = 1, $menu = NULL) {
  */
 function _site_map_taxonomys() {
   if (module_exist('taxonomy') && $vids = variable_get('site_map_show_vocabularies', array())) {
-    $result = db_query('SELECT vid, name, description 
+    $result = db_query('SELECT vid, name, description, weight 
       FROM {vocabulary} WHERE vid IN (%s) ORDER BY weight ASC, name', implode(',', $vids));
     while ($t = db_fetch_object($result)) {
       $output .= _site_map_taxonomy_tree($t->vid, $t->name, $t->description);
