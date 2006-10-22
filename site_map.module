@@ -77,7 +77,7 @@ function site_map_settings() {
     '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
   $vocab_options = array();
-  if (module_exist('taxonomy') {
+  if (module_exist('taxonomy')) {
     foreach (taxonomy_get_vocabularies() as $vocabulary) {
       $vocab_options[$vocabulary->vid] = $vocabulary->name;
     }
