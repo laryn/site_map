@@ -2,7 +2,7 @@ Drupal site map module:
 ----------------------
 Original author - Nic Ivy http://njivy.org
 Author - Fredrik Jonsson fredrik at combonet dot se
-Requires - Drupal 4.7
+Requires - Drupal 5
 License - GPL (see LICENSE)
 
 
