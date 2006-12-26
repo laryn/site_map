@@ -42,6 +42,13 @@ function site_map_admin_settings() {
     '#type' => 'fieldset',
     '#title' => t('Site map content'),
   );
+  $form['site_map_content']['site_map_show_front'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show front page'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('site_map_show_front', 1),
+    '#description' => t('When enabled, this option will include the front page in the site map.'),
+  );
   $form['site_map_content']['site_map_show_blogs'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show recent blog authors'),
@@ -218,7 +225,9 @@ function theme_site_map_display() {
     $output .= '</p>';
   }
 
-  $output .= _site_map_front_page();
+  if (variable_get('site_map_show_front', 0)) {
+    $output .= _site_map_front_page();
+  }
 
   if (variable_get('site_map_show_blogs', 0)) {
     $output .= _site_map_blogs();
