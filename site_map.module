@@ -57,9 +57,11 @@ function site_map_admin_settings() {
     '#description' => t('When enabled, this option will show the recent blog authors.'),
   );
   $book_options = array();
-  $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n INNER JOIN {book} b ON n.vid = b.vid WHERE b.parent = 0 ORDER BY b.weight, n.title'));
-  while ($row = db_fetch_object($result)) {
-    $book_options[$row->nid] = $row->title;
+  if (module_exists('book')) {
+    $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n INNER JOIN {book} b ON n.vid = b.vid WHERE b.parent = 0 ORDER BY b.weight, n.title'));
+    while ($row = db_fetch_object($result)) {
+      $book_options[$row->nid] = $row->title;
+    }
   }
   //$book_options[0] = t('<none>');
   $form['site_map_content']['site_map_show_books'] = array(
@@ -121,7 +123,7 @@ function site_map_admin_settings() {
     '#default_value' => variable_get('site_map_categories_depth', 'all'),
     '#size' => 3,
     '#maxlength' => 10,
-    '#description' => t('Specify how many subcategories should be included on the categorie page.  Enter "all" to include all subcategories or "0" to include no subcategories.'),
+    '#description' => t('Specify how many subcategories should be included on the categorie page.  Enter "all" to include all subcategories,"0" to include no subcategories, or "-1" not to append the depth at all.'),
   );
 
   $form['site_map_rss_options'] = array(
@@ -387,7 +389,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $rss_depth = 'all';
   }
   $cat_depth = variable_get('site_map_categories_depth', 'all');
-  if (!is_numeric($cat_depth) || $cat_depth < 0) {
+  if (!is_numeric($cat_depth)) {
     $cat_depth = 'all';
   }
 
@@ -418,7 +420,12 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $output .= '<li>';
     $term->count = taxonomy_term_count_nodes($term->tid);
     if ($term->count) {
-      $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description));
+      if ($cat_depth < 0) {
+       $output .= l($term->name, "taxonomy/term/$term->tid", array('title' => $term->description));   
+      }
+      else {
+       $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description)); 
+      } 
     }
     else {
        $output .= check_plain($term->name);
