@@ -64,7 +64,6 @@ function site_map_admin_settings() {
       $book_options[$row->nid] = $row->title;
     }
   }
-  //$book_options[0] = t('<none>');
   $form['site_map_content']['site_map_show_books'] = array(
     '#type' => 'select',
     '#title' => t('Books to include in the site map'),
@@ -75,7 +74,6 @@ function site_map_admin_settings() {
   );
   $menu_options = array();
   $menu_options = menu_get_root_menus();
-  //$menu_options[0] = t('<none>');
   $form['site_map_content']['site_map_show_menus'] = array(
     '#type' => 'select',
     '#title' => t('Menus to include in the site map'),
@@ -84,13 +82,19 @@ function site_map_admin_settings() {
     '#multiple' => TRUE,
     '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
+  $form['site_map_content']['site_map_show_faq'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show FAQ content'),
+    '#return_value' => 1,
+    '#default_value' => variable_get('site_map_show_faq', 1),
+    '#description' => t('When enabled, this option will include the content from the FAQ module in the site map.'),
+  );
   $vocab_options = array();
   if (module_exists('taxonomy')) {
     foreach (taxonomy_get_vocabularies() as $vocabulary) {
       $vocab_options[$vocabulary->vid] = $vocabulary->name;
     }
   }
-  //$vocab_options[0] = t('<none>');
   $form['site_map_content']['site_map_show_vocabularies'] = array(
     '#type' => 'select',
     '#title' => t('Categories to include in the site map'),
@@ -169,6 +173,7 @@ function site_map_menu($may_cache) {
     $items[] = array(
       'path' => 'sitemap',
       'title' => t('Site map'),
+      'description' => t('Display a site map with RSS feeds.'),
       'callback' => 'site_map_page',
       'access' => user_access('access site map'),
       'type' => MENU_SUGGESTED_ITEM
@@ -244,8 +249,13 @@ function theme_site_map_display() {
   // Compile the menu trees.
   $output .= _site_map_menus();
 
+  if (variable_get('site_map_show_faq', 1)) {
+    $output .= _site_map_faq();
+  }
+
   // Compile the vocabulary trees.
   $output .= _site_map_taxonomys();
+
 
   $output = '<div class="site-map">'. $output .'</div>';
 
@@ -355,6 +365,16 @@ function _site_map_menus() {
       $menu_display = _site_map_menu_tree($mid, $menu);
       $output .= theme('box', $title, $menu_display);
     }
+  }
+
+  return $output;
+}
+
+function _site_map_faq() {
+  if (module_exists('faq')) {
+    $title = variable_get('faq_title', t('Frequently Asked Questions'));
+    $output = faq_get_faq_list();
+    $output = theme('box', $title, $output);
   }
 
   return $output;
