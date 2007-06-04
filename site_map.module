@@ -256,6 +256,11 @@ function theme_site_map_display() {
   // Compile the vocabulary trees.
   $output .= _site_map_taxonomys();
 
+  // Invoke all custom modules and get themed HTML to be integrated into the site map.
+  $additional = module_invoke_all('site_map');
+  foreach ($additional as $themed_site_map_code) {
+    $output .= $themed_site_map_code;
+  }
 
   $output = '<div class="site-map">'. $output .'</div>';
 
@@ -265,15 +270,15 @@ function theme_site_map_display() {
 function theme_site_map_feed_icon($url, $type = 'node') {
   switch ($type) {
     case 'node':
-      $output = theme('image', (drupal_get_path('module', 'site_map'). '/feed-small.png'), t('Syndicate content'), t('Syndicate content'));
+      $output = theme('image', (drupal_get_path('module', 'site_map') .'/feed-small.png'), t('Syndicate content'), t('Syndicate content'));
       if ($url) {
-        $output = '<a href="'. check_url($url) .'" class="feed-link">'. $output. '</a>';
+        $output = '<a href="'. check_url($url) .'" class="feed-link">'. $output .'</a>';
       }
       break;
     case 'comment':
-      $output = theme('image', (drupal_get_path('module', 'site_map'). '/feed-small-comment.png'), t('Syndicate comments'), t('Syndicate comments'));
+      $output = theme('image', (drupal_get_path('module', 'site_map') .'/feed-small-comment.png'), t('Syndicate comments'), t('Syndicate comments'));
       if ($url) {
-        $output = '<a href="'. check_url($url) .'" class="feed-link">'. $output. '</a>';
+        $output = '<a href="'. check_url($url) .'" class="feed-link">'. $output .'</a>';
       }
       break;
   }
@@ -461,11 +466,11 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $term->count = taxonomy_term_count_nodes($term->tid);
     if ($term->count) {
       if ($cat_depth < 0) {
-       $output .= l($term->name, taxonomy_term_path($term), array('title' => $term->description));   
+        $output .= l($term->name, taxonomy_term_path($term), array('title' => $term->description));
       }
       else {
-       $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description)); 
-      } 
+        $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description));
+      }
     }
     else {
        $output .= check_plain($term->name);
