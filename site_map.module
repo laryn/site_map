@@ -363,12 +363,15 @@ function _site_map_books() {
  * Render menus
  */
 function _site_map_menus() {
+  $output = '';
   if ($mids = variable_get('site_map_show_menus', array())) {
     $menu = menu_get_menu();
     foreach ($mids as $mid) {
-      $title = $menu['visible'][$mid]['title'];
       $menu_display = _site_map_menu_tree($mid, $menu);
-      $output .= theme('box', $title, $menu_display);
+      if (!empty($menu_display)) {
+        $title = $menu['visible'][$mid]['title'];
+        $output .= theme('box', $title, $menu_display);
+      }
     }
   }
 
