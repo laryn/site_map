@@ -10,8 +10,8 @@
 /**
  * Implementation of hook_help().
  */
-function site_map_help($section) {
-  switch ($section) {
+function site_map_help($path, $arg) {
+  switch ($path) {
     case 'sitemap':
       $output = variable_get('site_map_message', '');
       return $output ? '<p>'. $output .'</p>' : '';
@@ -26,7 +26,21 @@ function site_map_perm() {
 }
 
 /**
- * Implementation of hook_settings().
+ * Implementation of hook_theme().
+ */
+function site_map_theme() {
+  return array(
+    'site_map_display' => array(
+      'arguments' => array(),
+    ),
+    'site_map_feed_icon' => array(
+      'arguments' => array('url' => NULL, 'type' => 'node'),
+    ),
+  );
+}
+
+/**
+ * Menu callback; presents the sitemap settings page.
  */
 function site_map_admin_settings() {
 
@@ -59,9 +73,8 @@ function site_map_admin_settings() {
   );
   $book_options = array();
   if (module_exists('book')) {
-    $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n INNER JOIN {book} b ON n.vid = b.vid WHERE b.parent = 0 ORDER BY b.weight, n.title'));
-    while ($row = db_fetch_object($result)) {
-      $book_options[$row->nid] = $row->title;
+    foreach (book_get_books() as $book) {
+      $book_options[$book['nid']] = $book['title'];
     }
   }
   $form['site_map_content']['site_map_show_books'] = array(
@@ -73,7 +86,7 @@ function site_map_admin_settings() {
     '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
   $menu_options = array();
-  $menu_options = menu_get_root_menus();
+  $menu_options = menu_get_menus();
   $form['site_map_content']['site_map_show_menus'] = array(
     '#type' => 'select',
     '#title' => t('Menus to include in the site map'),
@@ -157,28 +170,24 @@ function site_map_admin_settings() {
 /**
  * Implementation of hook_menu().
  */
-function site_map_menu($may_cache) {
-  $items = array();
-
-  if ($may_cache) {
-    $items[] = array(
-      'path' => 'admin/settings/sitemap',
-      'title' => t('Site map'),
-      'description' => t('Control what should be displayed on the site map.'),
-      'callback' => 'drupal_get_form',
-      'callback arguments' => 'site_map_admin_settings',
-      'access' => user_access('administer site configuration'),
-      'type' => MENU_NORMAL_ITEM
-    );
-    $items[] = array(
-      'path' => 'sitemap',
-      'title' => t('Site map'),
-      'description' => t('Display a site map with RSS feeds.'),
-      'callback' => 'site_map_page',
-      'access' => user_access('access site map'),
-      'type' => MENU_SUGGESTED_ITEM
-    );
-  }
+function site_map_menu() {
+  $items['admin/settings/sitemap'] = array(
+    'title' => 'Site map',
+    'description' => 'Control what should be displayed on the site map.',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('site_map_admin_settings'),
+    'access callback' => 'user_access',
+    'access arguments' => array('administer site configuration'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+  $items['sitemap'] = array(
+    'title' => 'Site map',
+    'description' => 'Display a site map with RSS feeds.',
+    'page callback' => 'site_map_page',
+    'access callback' => 'user_access',
+    'access arguments' => array('access site map'),
+    'type' => MENU_SUGGESTED_ITEM,
+  );
 
   return $items;
 }
@@ -215,7 +224,7 @@ function site_map_block($op = 'list', $delta = 0) {
 function site_map_page() {
   // Set breadcrumbs
   $breadcrumb = array(array('path' => 'sitemap'));
-  menu_set_location($breadcrumb);
+  //menu_set_location($breadcrumb);
 
   return theme('site_map_display');
 }
@@ -288,7 +297,7 @@ function theme_site_map_feed_icon($url, $type = 'node') {
 
 function _site_map_front_page() {
   $title = t('Front page');
-  $output = l(t("Front page of %sn", array("%sn" => variable_get('site_name', 'Drupal'))), '<front>', NULL, NULL, NULL, FALSE, TRUE) . (variable_get('site_map_show_rss_links', 1) ? ' '. theme('site_map_feed_icon', url('rss.xml')) . (module_exists('commentrss') ? ' '. theme('site_map_feed_icon', url('crss'), 'comment') : '') : '');
+  $output = l(t("Front page of %sn", array("%sn" => variable_get('site_name', 'Drupal'))), '<front>', array('html' => TRUE)) . (variable_get('site_map_show_rss_links', 1) ? ' '. theme('site_map_feed_icon', url('rss.xml')) . (module_exists('commentrss') ? ' '. theme('site_map_feed_icon', url('crss'), 'comment') : '') : '');
   $output = theme('box', $title, $output);
 
   return $output;
@@ -342,17 +351,22 @@ function _site_map_video() {
  * Render books
  */
 function _site_map_books() {
-  if (module_exists('book') && $nids = variable_get('site_map_show_books', array())) {
+  $output = '';
+  if (module_exists('book') && ($nids = variable_get('site_map_show_books', array()))) {
     $title = t('Books');
     $description = '<div class="description">'. t("Books at %sn.", array("%sn" => variable_get('site_name', 'Drupal'))) .'</div>';
-    $result = db_query(db_rewrite_sql('SELECT n.nid, n.title FROM {node} n INNER JOIN {book} b ON n.vid = b.vid WHERE b.parent = 0 AND n.status = 1 AND n.moderate = 0 AND n.nid IN (%s) ORDER BY b.weight, n.title'), implode(',', $nids));
-    while ($node = db_fetch_object($result)) {
-      $book_display .= '<h3>'. l($node->title, 'node/'. $node->nid) .'</h3>';
-      $book_display .= book_tree($node->nid, 5 , array(variable_get('site_map_books_expanded', 1) ? TRUE : ''));
+
+    $book_menus = array();
+    foreach ($nids as $nid) {
+      $node = node_load($nid);
+      $tree = menu_tree_all_data($node->book['menu_name'], $node->book);
+      $data = array_shift($tree);
+      $output .= theme('book_title_link', $data['link']);
+      $output .= ($data['below']) ? menu_tree_output($data['below']) : '';
     }
 
-    if ($book_display) {
-      $output = theme('box', $title, $description . $book_display);
+    if ($output) {
+      $output = theme('box', $title, $description . $output);
     }
   }
 
@@ -365,11 +379,11 @@ function _site_map_books() {
 function _site_map_menus() {
   $output = '';
   if ($mids = variable_get('site_map_show_menus', array())) {
-    $menu = menu_get_menu();
     foreach ($mids as $mid) {
-      $menu_display = _site_map_menu_tree($mid, $menu);
+      $menu = menu_load($mid);
+      $menu_display = menu_tree($mid);
       if (!empty($menu_display)) {
-        $title = $menu['visible'][$mid]['title'];
+        $title = $menu['title'];
         $output .= theme('box', $title, $menu_display);
       }
     }
@@ -387,22 +401,6 @@ function _site_map_faq() {
 
   return $output;
 }
-
-function _site_map_menu_tree($pid = 1, $menu = NULL) {
-// based on functions theme_menu_tree and menu_tree
-  if (isset($menu['visible'][$pid]) && $menu['visible'][$pid]['children']) {
-    foreach ($menu['visible'][$pid]['children'] as $mid) {
-      $children = isset($menu['visible'][$mid]['children']) ? $menu['visible'][$mid]['children'] : NULL;
-      $menu_tree .= theme('menu_item', $mid, _site_map_menu_tree($mid, $menu), count($children) == 0);
-    }
-  }
-  if ($menu_tree) {
-    $output = '<ul class="tree">'. $menu_tree .'</ul>';
-  }
-
-  return $output;
-}
-
 
 /**
  * This function can be called from blocks or pages as desired.
@@ -469,14 +467,14 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $term->count = taxonomy_term_count_nodes($term->tid);
     if ($term->count) {
       if ($cat_depth < 0) {
-        $output .= l($term->name, taxonomy_term_path($term), array('title' => $term->description));
+        $output .= l($term->name, taxonomy_term_path($term), array('attributes' => array('title' => $term->description)));
       }
       else {
-        $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('title' => $term->description));
+        $output .= l($term->name, "taxonomy/term/$term->tid/$cat_depth", array('attributes' => array('title' => $term->description)));
       }
     }
     else {
-       $output .= check_plain($term->name);
+      $output .= check_plain($term->name);
     }
     if (variable_get('site_map_show_count', 1)) {
       $output .= " ($term->count)";
