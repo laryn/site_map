@@ -277,6 +277,8 @@ function theme_site_map_display() {
 }
 
 function theme_site_map_feed_icon($url, $type = 'node') {
+  $output = '';
+
   switch ($type) {
     case 'node':
       $output = theme('image', (drupal_get_path('module', 'site_map') .'/feed-small.png'), t('Syndicate content'), t('Syndicate content'));
@@ -307,6 +309,7 @@ function _site_map_front_page() {
  * Render the latest blog authors
  */
 function _site_map_blogs() {
+  $output = '';
   if (module_exists('blog')) {
     $title = t('Blogs');
     $output = '<div class="description">'. t("Community blog and recent blog authors at %sn.", array("%sn" => variable_get('site_name', 'Drupal'))) .'</div>';
@@ -328,6 +331,7 @@ function _site_map_blogs() {
 }
 
 function _site_map_audio() {
+  $output = '';
   if (module_exists('audio')) {
     $title = t('Audio');
     $output = l(t('Audio content'), 'audio') . (variable_get('site_map_show_rss_links', 1) ? ' '. theme('site_map_feed_icon', url('audio/feed')) : '');
@@ -338,6 +342,7 @@ function _site_map_audio() {
 }
 
 function _site_map_video() {
+  $output = '';
   if (module_exists('video')) {
     $title = t('Video');
     $output = l(t('Video content'), 'video') . (variable_get('site_map_show_rss_links', 1) ? ' '. theme('site_map_feed_icon', url('video/feed')) : '');
@@ -393,6 +398,7 @@ function _site_map_menus() {
 }
 
 function _site_map_faq() {
+  $output = '';
   if (module_exists('faq')) {
     $title = variable_get('faq_title', t('Frequently Asked Questions'));
     $output = faq_get_faq_list();
@@ -406,9 +412,9 @@ function _site_map_faq() {
  * This function can be called from blocks or pages as desired.
  */
 function _site_map_taxonomys() {
+  $output = '';
   if (module_exists('taxonomy') && $vids = variable_get('site_map_show_vocabularies', array())) {
-    $result = db_query('SELECT vid, name, description 
-      FROM {vocabulary} WHERE vid IN (%s) ORDER BY weight ASC, name', implode(',', $vids));
+    $result = db_query('SELECT vid, name, description FROM {vocabulary} WHERE vid IN ('. db_placeholders($vids, 'int') .') ORDER BY weight ASC, name');
     while ($t = db_fetch_object($result)) {
       $output .= _site_map_taxonomy_tree($t->vid, $t->name, $t->description);
     }
