@@ -12,6 +12,13 @@
  */
 function site_map_admin_settings() {
 
+  // Field to set site map page title.
+  $form['site_map_page_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Page title'),
+    '#default_value' => variable_get('site_map_page_title', t('Site map')),
+    '#description' => t('Page title that will be used on the <a href="!link">site map page</a>.', array('!link' => url('sitemap'))),
+  );
   // Field to set site map message.
   $form['site_map_message'] = array(
     '#type' => 'textarea',
@@ -21,6 +28,7 @@ function site_map_admin_settings() {
     '#rows' => 5,
     '#description' => t('Define a message to be displayed above the site map.'),
   );
+  $form['site_map_message_format'] = filter_form(variable_get('site_map_message_format', FILTER_FORMAT_DEFAULT));
 
   $form['site_map_content'] = array(
     '#type' => 'fieldset',
@@ -50,7 +58,6 @@ function site_map_admin_settings() {
     '#default_value' => variable_get('site_map_show_books', array()),
     '#options' => $book_options,
     '#multiple' => TRUE,
-    '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
 //   $form['site_map_content']['site_map_books_expanded'] = array(
 //     '#type' => 'checkbox',
@@ -68,12 +75,11 @@ function site_map_admin_settings() {
     '#default_value' => variable_get('site_map_show_menus', array()),
     '#options' => $menu_options,
     '#multiple' => TRUE,
-    '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
   $form['site_map_content']['site_map_show_faq'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show FAQ content'),
-    '#default_value' => variable_get('site_map_show_faq', 1),
+    '#default_value' => variable_get('site_map_show_faq', 0),
     '#description' => t('When enabled, this option will include the content from the FAQ module in the site map.'),
   );
   $vocab_options = array();
@@ -88,7 +94,6 @@ function site_map_admin_settings() {
     '#default_value' => variable_get('site_map_show_vocabularies', array()),
     '#options' => $vocab_options,
     '#multiple' => TRUE,
-    '#description' => t('Ctrl-click (Windows) or Command-click (Mac) to select more than one value.'),
   );
 
   $form['site_map_taxonomy_options'] = array(
