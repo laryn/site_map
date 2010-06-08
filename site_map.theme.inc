@@ -2,16 +2,17 @@
 // $Id$
 
 /**
- * @file site_map.theme.inc
+ * @file
+ * site_map.theme.inc
  *
  * Site map theme functions.
  */
 
 
 function theme_site_map_rss_legend() {
-  $output .= '<p><strong>'. t('Legend:') .'</strong><br />';
-  $output .= '<span class="rss">'. theme('site_map_feed_icon', NULL) .'</span> '. t('Link to a content RSS feed');
-  $output .= '<br /><span class="rss">'. theme('site_map_feed_icon', NULL, 'comment') .'</span> '. t('Link to a comment RSS feed');
+  $output .= '<p><strong>' . t('Legend:') . '</strong><br />';
+  $output .= '<span class="rss">' . theme('site_map_feed_icon', array()) . '</span> ' . t('Link to a content RSS feed');
+  $output .= '<br /><span class="rss">' . theme('site_map_feed_icon', NULL, 'comment') . '</span> ' . t('Link to a comment RSS feed');
   $output .= '</p>';
 
   return $output;
@@ -29,16 +30,16 @@ function theme_site_map_rss_legend() {
  * @return
  *   A string containing the box output.
  */
-function theme_site_map_box($title, $content, $class = '') {
+function theme_site_map_box($variables) {
   $output = '';
-  if ($title || $content) {
-    $class = $class ? 'site-map-box '. $class : 'site-map-box';
-    $output .= '<div class="'. $class .'">';
-    if ($title) {
-      $output .= '<h2 class="title">'. $title .'</h2>';
+  if (($variables['title'] || $variables['content'])) {
+    $class = $variables['class'] ? 'site-map-box ' . $variables['class'] : 'site-map-box';
+    $output .= '<div class="' . $variables['class'] . '">';
+    if ($variables['title']) {
+      $output .= '<h2 class="title">' . $variables['title'] . '</h2>';
     }
-    if ($content) {
-      $output .= '<div class="content">'. $content .'</div>';
+    if ($variables['content']) {
+      $output .= '<div class="content">' . $variables['content'] . '</div>';
     }
     $output .= '</div>';
   }
@@ -56,23 +57,45 @@ function theme_site_map_box($title, $content, $class = '') {
  * @return
  *   A string containing the linked image.
  */
-function theme_site_map_feed_icon($url, $type = 'node') {
+function theme_site_map_feed_icon($variables) {
   $output = '';
 
-  switch ($type) {
+  switch ($variables['type']) {
     case 'node':
-      $output = theme('image', (drupal_get_path('module', 'site_map') .'/feed-small.png'), t('Syndicate content'), t('Syndicate content'));
+      $output = theme('image', array(
+        'path' => drupal_get_path('module', 'site_map') . '/feed-small.png',
+        'title' => t('Syndicate content'),
+        'alt' => t('Syndicate content'),
+        )
+      );
       break;
+
     case 'comment':
-      $output = theme('image', (drupal_get_path('module', 'site_map') .'/feed-small-comment.png'), t('Syndicate comments'), t('Syndicate comments'));
+      $output = theme('image', array(
+        'path' => drupal_get_path('module', 'site_map') . '/feed-small-comment.png',
+        'title' => t('Syndicate comments'),
+        'alt' => t('Syndicate comments'),
+        )
+      );
       break;
   }
 
-  if ($url) {
-    $output = l($output, $url, array('attributes' => array('class' => 'feed-link'), 'html' => TRUE));
+  if ($variables['url']) {
+    $output = l($output, $variables['url'], array('attributes' => array('class' => 'feed-link'), 'html' => TRUE));
   }
 
   return $output;
+}
+
+/**
+ * This is a clone of the core template_preprocess_menu_tree() function with the exception of
+ * the site_map specific class name used in the UL that also allow themers to
+ * override the function only for the site map page.
+ *
+ * Preprocesses the rendered tree for theme_site_map_menu_tree().
+ */
+function template_preprocess_site_map_menu_tree(&$variables) {
+  $variables['tree'] = $variables['tree']['#children'];
 }
 
 /**
@@ -84,8 +107,8 @@ function theme_site_map_feed_icon($url, $type = 'node') {
  *
  * @ingroup themeable
  */
-function theme_site_map_menu_tree($tree) {
-  return '<ul class="site-map-menu">'. $tree .'</ul>';
+function theme_site_map_menu_tree($variables) {
+  return '<ul class="site-map-menu">' . $variables['tree'] . '</ul>';
 }
 
 /**
@@ -96,15 +119,15 @@ function theme_site_map_menu_tree($tree) {
  *
  * @ingroup themeable
  */
-function theme_site_map_menu_item($link, $has_children, $menu = '', $in_active_trail = FALSE, $extra_class = NULL) {
-  $class = ($menu ? 'expanded' : ($has_children ? 'collapsed' : 'leaf'));
-  if (!empty($extra_class)) {
-    $class .= ' '. $extra_class;
+function theme_site_map_menu_link(array $variables) {
+  $element = $variables['element'];
+  $sub_menu = '';
+
+  if ($element['#below']) {
+    $sub_menu = drupal_render($element['#below']);
   }
-  if ($in_active_trail) {
-    $class .= ' active-trail';
-  }
-  return '<li class="'. $class .'">'. $link . $menu ."</li>\n";
+  $output = l($element['#title'], $element['#href'], $element['#localized_options']);
+  return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
 
 /**
@@ -113,7 +136,8 @@ function theme_site_map_menu_item($link, $has_children, $menu = '', $in_active_t
  * @see site-map.tpl.php
  */
 function template_preprocess_site_map(&$variables) {
-  $variables['message'] = check_markup(variable_get('site_map_message', ''), variable_get('site_map_message_format', FILTER_FORMAT_DEFAULT));
+  $message = variable_get('site_map_message', array());
+  $variables['message'] = check_markup($message['value'], $message['format']);
 
   if ((variable_get('site_map_show_rss_links', 1) != 0) && module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
     $variables['rss_legend'] = theme('site_map_rss_legend');

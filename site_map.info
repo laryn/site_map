@@ -1,4 +1,12 @@
 ; $Id$
 name = Site map
 description = Display a site map.
-core = 6.x
+core = 7.x
+configure = admin/config/content/sitemap
+
+files[] = site_map.admin.inc
+files[] = site_map.install
+files[] = site_map.module
+files[] = site_map.theme.inc
+
+version = "7.x-1.x-dev"

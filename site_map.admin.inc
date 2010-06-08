@@ -10,25 +10,25 @@
 /**
  * Menu callback; presents the sitemap settings page.
  */
-function site_map_admin_settings() {
+function site_map_admin_settings_form($form_state) {
 
   // Field to set site map page title.
   $form['site_map_page_title'] = array(
     '#type' => 'textfield',
     '#title' => t('Page title'),
     '#default_value' => variable_get('site_map_page_title', t('Site map')),
-    '#description' => t('Page title that will be used on the <a href="!link">site map page</a>.', array('!link' => url('sitemap'))),
+    '#description' => t('Page title that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
   );
   // Field to set site map message.
+  // FIXME: Bug http://drupal.org/node/820816, '#default_value' should normally work, but currently doesn't.
+  $site_map_message = variable_get('site_map_message', array('value' => '', 'format' => NULL));
   $form['site_map_message'] = array(
-    '#type' => 'textarea',
+    '#type' => 'text_format',
+    '#format' => isset($site_map_message['format']) ? $site_map_message['format'] : NULL,
     '#title' => t('Site map message'),
-    '#default_value' => variable_get('site_map_message', ''),
-    '#cols' => 60,
-    '#rows' => 5,
+    '#default_value' => $site_map_message['value'],
     '#description' => t('Define a message to be displayed above the site map.'),
   );
-  $form['site_map_message_format'] = filter_form(variable_get('site_map_message_format', FILTER_FORMAT_DEFAULT));
 
   $form['site_map_content'] = array(
     '#type' => 'fieldset',
@@ -112,21 +112,21 @@ function site_map_admin_settings() {
     '#default_value' => variable_get('site_map_categories_depth', 'all'),
     '#size' => 3,
     '#maxlength' => 10,
-    '#description' => t('Specify how many subcategories should be included on the categorie page. Enter "all" to include all subcategories,"0" to include no subcategories, or "-1" not to append the depth at all.'),
+    '#description' => t('Specify how many subcategories should be included on the categorie page. Enter "all" to include all subcategories, "0" to include no subcategories, or "-1" not to append the depth at all.'),
   );
   $form['site_map_taxonomy_options']['site_map_term_threshold'] = array(
     '#type' => 'textfield',
     '#title' => t('Category count threshold'),
     '#default_value' => variable_get('site_map_term_threshold', 0),
     '#size' => 3,
-    '#description' => t('Only show categories whose node counts are greater than this threshold. Set to -1 to disable')
+    '#description' => t('Only show categories whose node counts are greater than this threshold. Set to -1 to disable.'),
   );
   $form['site_map_taxonomy_options']['site_map_forum_threshold'] = array(
     '#type' => 'textfield',
     '#title' => t('Forum count threshold'),
     '#default_value' => variable_get('site_map_forum_threshold', -1),
     '#size' => 3,
-    '#description' => t('Only show forums whose node counts are greater than this threshold. Set to -1 to disable')
+    '#description' => t('Only show forums whose node counts are greater than this threshold. Set to -1 to disable.'),
   );
 
   $form['site_map_rss_options'] = array(
@@ -143,7 +143,11 @@ function site_map_admin_settings() {
     '#type' => 'select',
     '#title' => t('Include RSS links'),
     '#default_value' => variable_get('site_map_show_rss_links', 1),
-    '#options' => array(0 => t('None'), 1 => t('Include on the right side'), 2 => t('Include on the left side')),
+    '#options' => array(
+      0 => t('None'),
+      1 => t('Include on the right side'),
+      2 => t('Include on the left side')
+    ),
     '#description' => t('When enabled, this option will show links to the RSS feeds for each category and blog.'),
   );
   $form['site_map_rss_options']['site_map_rss_depth'] = array(
@@ -163,7 +167,7 @@ function site_map_admin_settings() {
     '#type' => 'checkbox',
     '#title' => t('Do not include site map CSS file'),
     '#default_value' => variable_get('site_map_css', 0),
-    '#description' => t('If you don\'t want to load the included CSS file you can check this box.'),
+    '#description' => t("If you don't want to load the included CSS file you can check this box."),
   );
 
   // Make use of the Checkall module if it's installed.
