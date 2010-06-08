@@ -48,20 +48,12 @@ function site_map_theme() {
       'variables' => array('url' => NULL, 'type' => 'node'),
       'file' => 'site_map.theme.inc',
     ),
-/*    'site_map_menu_link' => array(
+    'site_map_menu_link' => array(
       'render element' => 'element',
       'file' => 'site_map.theme.inc',
     ),
     'site_map_menu_tree' => array(
       'render element' => 'tree',
-      'file' => 'site_map.theme.inc',
-    ), */
-    'site_map_menu_tree' => array(
-      'variables' => array('tree' => NULL),
-      'file' => 'site_map.theme.inc',
-    ),
-    'site_map_menu_link' => array(
-      'variables' => array('element' => NULL),
       'file' => 'site_map.theme.inc',
     ),
     'site_map_rss_legend' => array(
