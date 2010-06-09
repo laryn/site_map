@@ -8,27 +8,26 @@
  * Site map theme functions.
  */
 
-
+/**
+ * Returns HTML for a site map feed icon legend.
+ */
 function theme_site_map_rss_legend() {
   $output .= '<p><strong>' . t('Legend:') . '</strong><br />';
-  $output .= '<span class="rss">' . theme('site_map_feed_icon', array()) . '</span> ' . t('Link to a content RSS feed');
-  $output .= '<br /><span class="rss">' . theme('site_map_feed_icon', NULL, 'comment') . '</span> ' . t('Link to a comment RSS feed');
+  $output .= '<span class="rss">' . theme('site_map_feed_icon', array('type' => 'node')) . '</span> ' . t('Link to a content RSS feed');
+  $output .= '<br /><span class="rss">' . theme('site_map_feed_icon', array('type' => 'comment')) . '</span> ' . t('Link to a comment RSS feed');
   $output .= '</p>';
 
   return $output;
 }
 
 /**
- * Return a themed site map box.
+ * Returns HTML for a themed site map box.
  *
- * @param $title
- *   The subject of the box.
- * @param $content
- *   The content of the box.
- * @param $class
- *   Optional extra class for the box.
- * @return
- *   A string containing the box output.
+ * @param $variables
+ *   An associative array containing:
+ *   - title: The subject of the box.
+ *   - content: The content of the box.
+ *   - class:  Optional extra class for the box.
  */
 function theme_site_map_box($variables) {
   $output = '';
@@ -48,14 +47,12 @@ function theme_site_map_box($variables) {
 }
 
 /**
- * Return a themed feed icon.
+ * Returns HTML for a feed icon with link.
  *
- * @param $url
- *   The feed URL.
- * @param $type
- *   The type of feed icon.
- * @return
- *   A string containing the linked image.
+ * @param $variables
+ *   An associative array containing:
+ *   - url: The url of the feed.
+ *   - type: The type of feed icon.
  */
 function theme_site_map_feed_icon($variables) {
   $output = '';
@@ -80,7 +77,7 @@ function theme_site_map_feed_icon($variables) {
       break;
   }
 
-  if ($variables['url']) {
+  if (!empty($variables['url'])) {
     $output = l($output, $variables['url'], array('attributes' => array('class' => 'feed-link'), 'html' => TRUE));
   }
 
@@ -103,8 +100,13 @@ function template_preprocess_site_map_menu_tree(&$variables) {
  * the site_map specific class name used in the UL that also allow themers to
  * override the function only for the site map page.
  *
- * Generate the HTML output for a menu tree
+ * Returns HTML for a wrapper for a menu sub-tree.
  *
+ * @param $variables
+ *   An associative array containing:
+ *   - tree: An HTML string containing the tree's items.
+ *
+ * @see template_preprocess_menu_tree()
  * @ingroup themeable
  */
 function theme_site_map_menu_tree($variables) {
@@ -115,7 +117,11 @@ function theme_site_map_menu_tree($variables) {
  * This is a one by one clone of the core theme_menu_item() function that allows
  * custom theming of the site map page items.
  *
- * Generate the HTML output for a menu item and submenu.
+ * Returns HTML for a menu link and submenu.
+ *
+ * @param $variables
+ *   An associative array containing:
+ *   - element: Structured array data for a menu link.
  *
  * @ingroup themeable
  */

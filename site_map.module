@@ -367,15 +367,12 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $cat_depth = 'all';
   }
 
-  $output .= !empty($description) ? '<div class="taxonomy-term-description">' . filter_xss_admin($description) . "</div>\n" : '';
+  $output .= !empty($description) ? '<div class="description">' . filter_xss_admin($description) . "</div>\n" : '';
 
   // taxonomy_get_tree() honors access controls
   $tree = taxonomy_get_tree($vid);
   foreach ($tree as $term) {
-    // FIXME: field_attach_query() how does this sh** work???
-    //field_attach_query($term->tid, array(), array('count' => TRUE));
-    $term->count = 5;
-    //$term->count = taxonomy_term_count_nodes($term->tid);
+    $term->count = site_map_taxonomy_term_count_nodes($term->tid);
     if ($term->count <= $threshold) {
       continue;
     }
@@ -444,6 +441,31 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-terms-box site-map-terms-box-' . $vid . $class));
 
   return $output;
+}
+
+/**
+ * Count the number of published nodes classified by a term.
+ *
+ * This is a re-implementation of taxonomy_term_count_nodes() that has been
+ * removed from D7 core.
+ *
+ * Implementation note: the normal way to count field instances is through
+ * field_attach_query(), but taxonomy.module has a special denormalized
+ * table taxonomy_index which we can use for more speed. THX to taxonews.
+ *
+ * @param $tid
+ *   The term's ID.
+ * @return
+ *   An integer representing a number of nodes. Results are statically cached.
+ */
+function site_map_taxonomy_term_count_nodes($tid) {
+  $query = db_select('taxonomy_index', 'ti');
+  $query->addExpression('COUNT(ti.nid)');
+  $count = $query
+    ->condition('ti.tid', $tid)
+    ->execute()->fetchCol();
+
+  return $count[0];
 }
 
 /**
