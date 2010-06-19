@@ -20,7 +20,6 @@ function site_map_admin_settings_form($form_state) {
     '#description' => t('Page title that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
   );
   // Field to set site map message.
-  // FIXME: Bug http://drupal.org/node/820816, '#default_value' should normally work, but currently doesn't.
   $site_map_message = variable_get('site_map_message', array('value' => '', 'format' => NULL));
   $form['site_map_message'] = array(
     '#type' => 'text_format',
