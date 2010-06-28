@@ -177,5 +177,5 @@ function site_map_admin_settings_form($form_state) {
   }
 
   // Do NOT autoload the form field variables as it would break in '#type' => 'text_format' field.
-  return system_settings_form($form, FALSE);
+  return system_settings_form($form);
 }
