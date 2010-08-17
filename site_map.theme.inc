@@ -143,7 +143,9 @@ function theme_site_map_menu_link(array $variables) {
  */
 function template_preprocess_site_map(&$variables) {
   $message = variable_get('site_map_message', array());
-  $variables['message'] = check_markup($message['value'], $message['format']);
+  if (!empty($message)) {
+    $variables['message'] = check_markup($message['value'], $message['format']);
+  }
 
   if ((variable_get('site_map_show_rss_links', 1) != 0) && module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
     $variables['rss_legend'] = theme('site_map_rss_legend');

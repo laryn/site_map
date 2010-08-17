@@ -176,6 +176,5 @@ function site_map_admin_settings_form($form_state) {
     $form['site_map_content']['site_map_show_vocabularies']['#checkall'] = TRUE;
   }
 
-  // Do NOT autoload the form field variables as it would break in '#type' => 'text_format' field.
   return system_settings_form($form);
 }
