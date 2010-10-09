@@ -67,7 +67,7 @@ function site_map_theme() {
  * Implements hook_menu().
  */
 function site_map_menu() {
-  $items['admin/config/content/sitemap'] = array(
+  $items['admin/config/search/sitemap'] = array(
     'title' => 'Site map',
     'description' => 'Control what should be displayed on the site map.',
     'page callback' => 'drupal_get_form',
