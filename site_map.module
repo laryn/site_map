@@ -253,7 +253,9 @@ function _site_map_video() {
  */
 function _site_map_books() {
   $output = '';
-  if (module_exists('book') && ($nids = variable_get('site_map_show_books', array()))) {
+  $nids = array_filter(variable_get('site_map_show_books', array()));
+
+  if (module_exists('book') && !empty($nids)) {
     $title = t('Books');
     $description = '<div class="description">' . t('Books at %sn.', array('%sn' => variable_get('site_name', 'Drupal'))) . '</div>';
 
@@ -266,7 +268,7 @@ function _site_map_books() {
       $output .= ($data['below']) ? _site_map_menu_tree_output($data['below']) : '';
     }
 
-    if ($output) {
+    if (!empty($output)) {
       $output = theme('site_map_box', array('title' => $title, 'content' => $description . $output, 'class' => 'site-map-book-box'));
     }
   }
@@ -278,10 +280,10 @@ function _site_map_books() {
  * Render menus
  */
 function _site_map_menus() {
-  $mids = variable_get('site_map_show_menus', array());
-
   $output = '';
-  if ($mids) {
+  $mids = array_filter(variable_get('site_map_show_menus', array()));
+
+  if (!empty($mids)) {
     foreach ($mids as $mid) {
       $menu = menu_load($mid);
       // Use menu_tree_all_data to retrieve the expanded tree.
@@ -317,7 +319,9 @@ function _site_map_faq() {
  */
 function _site_map_taxonomys() {
   $output = '';
-  if (module_exists('taxonomy') && $vids = variable_get('site_map_show_vocabularies', array())) {
+  $vids = array_filter(variable_get('site_map_show_vocabularies', array()));
+
+  if (module_exists('taxonomy') && !empty($vids)) {
     $result = db_query('SELECT vid, name, description FROM {taxonomy_vocabulary} WHERE vid IN (:vids) ORDER BY weight ASC, name', array(':vids' => $vids));
     foreach ($result as $t) {
       if (module_exists('i18ntaxonomy')) {
@@ -358,14 +362,6 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array('url' => "crss/vocab/$vid", 'type' => 'comment')) : '');
 
   $last_depth = -1;
-  $rss_depth = variable_get('site_map_rss_depth', 'all');
-  if (!is_numeric($rss_depth) || $rss_depth < 0) {
-    $rss_depth = 'all';
-  }
-  $cat_depth = variable_get('site_map_categories_depth', 'all');
-  if (!is_numeric($cat_depth)) {
-    $cat_depth = 'all';
-  }
 
   $output .= !empty($description) ? '<div class="description">' . filter_xss_admin($description) . "</div>\n" : '';
 
@@ -403,7 +399,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $term_item .= l($term->name, 'forum/' . $term->tid, array('attributes' => array('title' => $term->description)));
     }
     elseif ($term->count) {
-      $term_item .= l($term->name, ($cat_depth < 0) ? taxonomy_term_path($term) : "taxonomy/term/$term->tid/$cat_depth", array('attributes' => array('title' => $term->description)));
+      $term_item .= l($term->name, 'taxonomy/term/' . $term->tid, array('attributes' => array('title' => $term->description)));
     }
     else {
       $term_item .= check_plain($term->name);
@@ -413,7 +409,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     }
 
     if (variable_get('site_map_show_rss_links', 1) != 0) {
-      $rss_link = theme('site_map_feed_icon', array('url' => "taxonomy/term/$term->tid/$rss_depth/feed"));
+      $rss_link = theme('site_map_feed_icon', array('url' => 'taxonomy/term/' . $term->tid . '/feed'));
       if (module_exists('commentrss') && variable_get('commentrss_term', FALSE)) {
         $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => "crss/term/$term->tid", 'type' => 'comment'));
       }
