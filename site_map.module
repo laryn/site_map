@@ -73,7 +73,6 @@ function site_map_menu() {
     'page arguments' => array('site_map_admin_settings_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'site_map.admin.inc',
-    'type' => MENU_NORMAL_ITEM,
   );
   $items['sitemap'] = array(
     'title' => 'Site map',
@@ -87,14 +86,19 @@ function site_map_menu() {
 }
 
 /**
- * Implements hook_block().
+ * Implements hook_block_info().
  */
 function site_map_block_info() {
   $block['syndicate']['info'] = t('Syndicate (site map)');
+  // Do no caching because $feedurl is different for blogs.
+  $blocks['syndicate']['cache'] = DRUPAL_NO_CACHE;
 
   return $block;
 }
 
+/**
+ * Implements hook_block_view().
+ */
 function site_map_block_view($delta = '') {
   if (user_access('access content')) {
     switch ($delta) {
@@ -107,8 +111,14 @@ function site_map_block_view($delta = '') {
         else {
           $feedurl = variable_get('site_map_rss_front', 'rss.xml');
         }
-        $block['content'] = theme('feed_icon', array('url' => url($feedurl), 'title' => t('Syndicate')));
-        $block['content'] .= '<div class="more-link">' . l(t('more'), 'sitemap', array('title' => t('View the site map to see more RSS feeds.'))) . "</div>\n";
+        $block['content'] = theme('feed_icon', array(
+          'url' => $feedurl,
+          'title' => t('Syndicate'),
+        ));
+        $block['content'] .= theme('more_link', array(
+          'url' => 'sitemap',
+          'title' => t('View the site map to see more RSS feeds.'),
+        ));
         break;
     }
 
