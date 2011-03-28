@@ -9,7 +9,7 @@
 /**
  * Menu callback; presents the sitemap settings page.
  */
-function site_map_admin_settings_form($form_state) {
+function site_map_admin_settings_form() {
 
   // Field to set site map page title.
   $form['site_map_page_title'] = array(
