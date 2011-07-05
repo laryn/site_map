@@ -297,8 +297,8 @@ function _site_map_menus() {
       $menu = menu_load($mid);
       // Use menu_tree_all_data to retrieve the expanded tree.
       $tree = menu_tree_all_data($mid);
-      if (module_exists('i18nmenu')) {
-        i18nmenu_localize_tree($tree);
+      if (module_exists('i18n_menu')) {
+        $tree = i18n_menu_localize_tree($tree, $GLOBALS['language']->language);
       }
       $menu_display = _site_map_menu_tree_output($tree);
       $menu_html = drupal_render($menu_display);
@@ -332,11 +332,11 @@ function _site_map_taxonomys() {
 
   if (module_exists('taxonomy') && !empty($vids)) {
     $result = db_query('SELECT vid, name, description FROM {taxonomy_vocabulary} WHERE vid IN (:vids) ORDER BY weight ASC, name', array(':vids' => $vids));
-    foreach ($result as $t) {
-      if (module_exists('i18ntaxonomy')) {
-        $t->name = tt("taxonomy:vocabulary:$t->vid:name", $t->name);
+    foreach ($result as $voc) {
+      if (module_exists('i18n_taxonomy')) {
+        $voc->name = i18n_taxonomy_vocabulary_name($voc, $GLOBALS['language']->language);
       }
-      $output .= _site_map_taxonomy_tree($t->vid, $t->name, $t->description);
+      $output .= _site_map_taxonomy_tree($voc->vid, $voc->name, $voc->description);
     }
   }
 
@@ -382,8 +382,8 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       continue;
     }
 
-    if (module_exists('i18ntaxonomy')) {
-      $term->name = tt("taxonomy:term:$term->tid:name", $term->name);
+    if (module_exists('i18n_taxonomy')) {
+      $term->name = i18n_taxonomy_term_name($term, $GLOBALS['language']->language);
     }
 
     // Adjust the depth of the <ul> based on the change
