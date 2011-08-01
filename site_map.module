@@ -86,6 +86,27 @@ function site_map_menu() {
 }
 
 /**
+ * Implements hook_variable_info().
+ */
+function site_map_variable_info($options) {
+  $variable['site_map_page_title'] = array(
+    'type' => 'string',
+    'title' => t('Site map title', array(), $options),
+    'description' => t('Page title that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
+    'default' => 'Site map',
+  );
+
+  $variable['site_map_rss_front'] = array(
+    'type' => 'string',
+    'title' => t('RSS feed for front page', array(), $options),
+    'description' => t('The RSS feed for the front page, default is rss.xml.'),
+    'default' => 'rss.xml',
+  );
+
+  return $variable;
+}
+
+/**
  * Implements hook_block_info().
  */
 function site_map_block_info() {
