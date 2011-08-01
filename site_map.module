@@ -40,7 +40,7 @@ function site_map_theme() {
       'file' => 'site_map.theme.inc',
     ),
     'site_map_box' => array(
-      'variables' => array('title' => NULL, 'content' => NULL, 'class' => NULL),
+      'variables' => array('title' => NULL, 'content' => NULL, 'attributes' => array()),
       'file' => 'site_map.theme.inc',
     ),
     'site_map_feed_icon' => array(
@@ -133,7 +133,7 @@ function site_map_page() {
   drupal_set_title(variable_get('site_map_page_title', t('Site map')));
 
   if (variable_get('site_map_css', 0) != 1) {
-    drupal_add_css(drupal_get_path('module', 'site_map') . '/site_map.css');
+    drupal_add_css(drupal_get_path('module', 'site_map') . '/site_map.theme.css');
   }
 
   return theme('site_map');
@@ -141,7 +141,7 @@ function site_map_page() {
 
 function _site_map_front_page() {
   $output = '';
-  $class = '';
+  $class = array();
   $title = t('Front page');
   $output = l(t('Front page of %sn', array('%sn' => variable_get('site_name', 'Drupal'))), '<front>', array('html' => TRUE));
 
@@ -154,12 +154,15 @@ function _site_map_front_page() {
       $output .= ' ' . $rss_link;
     }
     else {
-      $class = ' site-map-rss-left';
+      $class[] = 'site-map-rss-left';
       $output = $rss_link . ' ' . $output;
     }
   }
 
-  return theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-front-box' . $class));
+  $class[] = 'site-map-box-front';
+  $attributes = array('class' => $class);
+
+  return theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
 }
 
 /**
@@ -167,7 +170,7 @@ function _site_map_front_page() {
  */
 function _site_map_blogs() {
   $output = '';
-  $class = '';
+  $class = array();
   if (module_exists('blog')) {
     $title = t('Blogs');
     $output = '<div class="description">' . t('Community blog and recent blog authors at %sn.', array('%sn' => variable_get('site_name', 'Drupal'))) . '</div>';
@@ -179,7 +182,7 @@ function _site_map_blogs() {
         $blog_link .= ' ' . $rss_link;
       }
       else {
-        $class = ' site-map-rss-left';
+        $class[] = 'site-map-rss-left';
         $blog_link = $rss_link . ' ' . $blog_link;
       }
     }
@@ -206,8 +209,12 @@ function _site_map_blogs() {
       }
       $blogs[] = $blog_item;
     }
+
+    $class[] = 'site-map-box-blog';
+    $attributes = array('class' => $class);
+
     $output .= theme('item_list', array('items' => $blogs));
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-blog-box' . $class));
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
   }
 
   return $output;
@@ -215,7 +222,7 @@ function _site_map_blogs() {
 
 function _site_map_audio() {
   $output = '';
-  $class = '';
+  $class = array();
   if (module_exists('audio')) {
     $title = t('Audio');
     $output = l(t('Audio content'), 'audio');
@@ -225,11 +232,15 @@ function _site_map_audio() {
         $output .= ' ' . $rss_link;
       }
       else {
-        $class = ' site-map-rss-left';
+        $class[] = 'site-map-rss-left';
         $output = $rss_link . ' ' . $output;
       }
     }
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-audio-box' . $class));
+
+    $class[] = 'site-map-box-audio';
+    $attributes = array('class' => $class);
+
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
   }
 
   return $output;
@@ -237,7 +248,7 @@ function _site_map_audio() {
 
 function _site_map_video() {
   $output = '';
-  $class = '';
+  $class = array();
   if (module_exists('video')) {
     $title = t('Video');
     $output = l(t('Video content'), 'video');
@@ -247,11 +258,15 @@ function _site_map_video() {
         $output .= ' ' . $rss_link;
       }
       else {
-        $class = ' site-map-rss-left';
+        $class[] = 'site-map-rss-left';
         $output = $rss_link . '  ' . $output;
       }
     }
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-video-box' . $class));
+
+    $class[] = 'site-map-box-video';
+    $attributes = array('class' => $class);
+
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
   }
 
   return $output;
@@ -278,7 +293,9 @@ function _site_map_books() {
     }
 
     if (!empty($output)) {
-      $output = theme('site_map_box', array('title' => $title, 'content' => $description . $output, 'class' => 'site-map-book-box'));
+      $attributes = array('class' => array('site-map-box-book'));
+
+      $output = theme('site_map_box', array('title' => $title, 'content' => $description . $output, 'attributes' => $attributes));
     }
   }
 
@@ -290,6 +307,7 @@ function _site_map_books() {
  */
 function _site_map_menus() {
   $output = '';
+  $class = array();
   $mids = array_filter(variable_get('site_map_show_menus', array()));
 
   if (!empty($mids)) {
@@ -304,7 +322,10 @@ function _site_map_menus() {
       $menu_html = drupal_render($menu_display);
       if (!empty($menu_html)) {
         $title = $menu['title'];
-        $output .= theme('site_map_box', array('title' => $title, 'content' => $menu_html, 'class' => 'site-map-menu-box'));
+        $class[] = 'site-map-box-menu';
+        $class[] = 'site-map-box-menu-' . $mid;
+        $attributes = array('class' => $class);
+        $output .= theme('site_map_box', array('title' => $title, 'content' => $menu_html, 'attributes' => $attributes));
       }
     }
   }
@@ -316,8 +337,9 @@ function _site_map_faq() {
   $output = '';
   if (module_exists('faq')) {
     $title = variable_get('faq_title', t('Frequently Asked Questions'));
+    $attributes = array('class' => array('site-map-box-faq'));
     $output = faq_get_faq_list();
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-faq-box'));
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
   }
 
   return $output;
@@ -357,7 +379,7 @@ function _site_map_taxonomys() {
  */
 function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   $output = '';
-  $class = '';
+  $class = array();
   if ($vid == variable_get('forum_nav_vocabulary', '')) {
     $title = l($name, 'forum');
     $threshold = variable_get('site_map_forum_threshold', -1);
@@ -426,7 +448,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
         $term_item .= ' ' . $rss_link;
       }
       else {
-        $class = ' site-map-rss-left';
+        $class[] = 'site-map-rss-left';
         $term_item = $rss_link . ' ' . $term_item;
       }
     }
@@ -443,7 +465,12 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $output .= "</li>\n</ul>\n";
     }
   }
-  $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'class' => 'site-map-terms-box site-map-terms-box-' . $vid . $class));
+
+  $class[] = 'site-map-box-terms';
+  $class[] = 'site-map-box-terms-' . $vid;
+  $attributes = array('class' => $class);
+
+  $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
 
   return $output;
 }
