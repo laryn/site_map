@@ -11,6 +11,10 @@
   padding-left: 1.5em;
 }
 
+#site-map .site-map-box ul ul {
+  margin: 0;
+}
+
 /* Styles when RSS icons are displayed on the left. */
 #site-map .site-map-rss-left ul {
   padding-left: 0;

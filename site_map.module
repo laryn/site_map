@@ -298,19 +298,33 @@ function _site_map_video() {
  */
 function _site_map_books() {
   $output = '';
-  $nids = array_filter(variable_get('site_map_show_books', array()));
+  $book_titles = array();
+  $mlid = array_filter(variable_get('site_map_show_books', array()));
 
-  if (module_exists('book') && !empty($nids)) {
+  if (module_exists('book') && !empty($mlid)) {
+    $books_expanded = variable_get('site_map_books_expanded', 1);
     $title = t('Books');
     $description = '<div class="description">' . t('Books at %sn.', array('%sn' => variable_get('site_name', 'Drupal'))) . '</div>';
 
-    $book_menus = array();
-    foreach ($nids as $nid) {
-      $node = node_load($nid);
-      $tree = menu_tree_all_data($node->book['menu_name']);
-      $data = array_shift($tree);
-      $output .= theme('book_title_link', array('link' => $data['link']));
-      $output .= ($data['below']) ? _site_map_menu_tree_output($data['below']) : '';
+    foreach (book_get_books() as $book_id => $book) {
+      if (in_array($book['mlid'], $mlid)) {
+        // Use menu_tree_all_data to retrieve the expanded tree.
+        $tree = menu_tree_all_data($book['menu_name']);
+        if (module_exists('i18n_menu')) {
+          $tree = i18n_menu_localize_tree($tree, $GLOBALS['language']->language);
+        }
+        if ($books_expanded) {
+          $output .= drupal_render(_site_map_menu_tree_output($tree));
+        }
+        else {
+          $data = array_shift($tree);
+          $book_titles[] = theme('book_title_link', array('link' => $data['link']));
+        }
+      }
+    }
+
+    if (!$books_expanded && !empty($book_titles)) {
+      $output .= theme('item_list', array('items' => $book_titles));
     }
 
     if (!empty($output)) {
@@ -527,10 +541,16 @@ function site_map_taxonomy_term_count_nodes($tid) {
  *
  * Returns a rendered menu tree.
  *
+ * The menu item's LI element is given one of the following classes:
+ * - expanded: The menu item is showing its submenu.
+ * - collapsed: The menu item has a submenu which is not shown.
+ * - leaf: The menu item has no submenu.
+ *
  * @param $tree
  *   A data structure representing the tree as returned from menu_tree_data.
+ *
  * @return
- *   The rendered HTML of that data structure.
+ *   A structured array to be rendered by drupal_render().
  */
 function _site_map_menu_tree_output($tree) {
   $build = array();
@@ -539,11 +559,12 @@ function _site_map_menu_tree_output($tree) {
   // Pull out just the menu links we are going to render so that we
   // get an accurate count for the first/last classes.
   foreach ($tree as $data) {
-    if (!$data['link']['hidden']) {
+    if ($data['link']['access'] && !$data['link']['hidden']) {
       $items[] = $data;
     }
   }
 
+  $router_item = menu_get_item();
   $num_items = count($items);
   foreach ($items as $i => $data) {
     $class = array();
@@ -553,8 +574,10 @@ function _site_map_menu_tree_output($tree) {
     if ($i == $num_items - 1) {
       $class[] = 'last';
     }
-    // Set a class if the link has children.
-    if ($data['below']) {
+    // Set a class for the <li>-tag. Since $data['below'] may contain local
+    // tasks, only set 'expanded' class if the link also has children within
+    // the current menu.
+    if ($data['link']['has_children'] && $data['below']) {
       $class[] = 'expanded';
     }
     elseif ($data['link']['has_children']) {
@@ -566,11 +589,18 @@ function _site_map_menu_tree_output($tree) {
     // Set a class if the link is in the active trail.
     if ($data['link']['in_active_trail']) {
       $class[] = 'active-trail';
-      $data['localized_options']['attributes']['class'][] = 'active-trail';
+      $data['link']['localized_options']['attributes']['class'][] = 'active-trail';
+    }
+    // Normally, l() compares the href of every link with $_GET['q'] and sets
+    // the active class accordingly. But local tasks do not appear in menu
+    // trees, so if the current path is a local task, and this link is its
+    // tab root, then we have to set the class manually.
+    if ($data['link']['href'] == $router_item['tab_root_href'] && $data['link']['href'] != $_GET['q']) {
+      $data['link']['localized_options']['attributes']['class'][] = 'active';
     }
 
     // Allow menu-specific theme overrides.
-    $element['#theme'] = 'site_map_menu_link__' . $data['link']['menu_name'];
+    $element['#theme'] = 'site_map_menu_link__' . strtr($data['link']['menu_name'], '-', '_');
     $element['#attributes']['class'] = $class;
     $element['#title'] = $data['link']['title'];
     $element['#href'] = $data['link']['href'];
@@ -585,7 +615,7 @@ function _site_map_menu_tree_output($tree) {
     $build['#sorted'] = TRUE;
     // Add the theme wrapper for outer markup.
     // Allow menu-specific theme overrides.
-    $build['#theme_wrappers'][] = 'site_map_menu_tree__' . $data['link']['menu_name'];
+    $build['#theme_wrappers'][] = 'site_map_menu_tree__' . strtr($data['link']['menu_name'], '-', '_');
   }
 
   return $build;
