@@ -314,7 +314,8 @@ function _site_map_books() {
           $tree = i18n_menu_localize_tree($tree, $GLOBALS['language']->language);
         }
         if ($books_expanded) {
-          $output .= drupal_render(_site_map_menu_tree_output($tree));
+          $tree_output = _site_map_menu_tree_output($tree);
+          $output .= drupal_render($tree_output);
         }
         else {
           $data = array_shift($tree);
