@@ -8,6 +8,13 @@
  * Now maintained by Fredrik Jonsson fredrik at combonet dot se
  */
 
+/*
+ $options = array();
+  if (variable_get('site_map_show_titles', 1) == 1) {
+      $options['show_titles'] = TRUE;
+  }
+*/
+
 /**
  * Implements hook_permission().
  */
@@ -163,6 +170,7 @@ function site_map_page() {
 function _site_map_front_page() {
   $output = '';
   $class = array();
+  $options = array();
   $title = t('Front page');
   $output = l(t('Front page of %sn', array('%sn' => variable_get('site_name', 'Drupal'))), '<front>', array('html' => TRUE));
 
@@ -179,11 +187,12 @@ function _site_map_front_page() {
       $output = $rss_link . ' ' . $output;
     }
   }
+  _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
   $class[] = 'site-map-box-front';
   $attributes = array('class' => $class);
 
-  return theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+  return theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
 }
 
 /**
@@ -192,6 +201,7 @@ function _site_map_front_page() {
 function _site_map_blogs() {
   $output = '';
   $class = array();
+  $options = array();
   if (module_exists('blog')) {
     $title = t('Blogs');
     $output = '<div class="description">' . t('Community blog and recent blog authors at %sn.', array('%sn' => variable_get('site_name', 'Drupal'))) . '</div>';
@@ -207,6 +217,8 @@ function _site_map_blogs() {
         $blog_link = $rss_link . ' ' . $blog_link;
       }
     }
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
+
     $blogs = array();
     $blogs[] = $blog_link;
 
@@ -235,7 +247,7 @@ function _site_map_blogs() {
     $attributes = array('class' => $class);
 
     $output .= theme('item_list', array('items' => $blogs));
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
   }
 
   return $output;
@@ -244,6 +256,7 @@ function _site_map_blogs() {
 function _site_map_audio() {
   $output = '';
   $class = array();
+  $options = array();
   if (module_exists('audio')) {
     $title = t('Audio');
     $output = l(t('Audio content'), 'audio');
@@ -257,11 +270,12 @@ function _site_map_audio() {
         $output = $rss_link . ' ' . $output;
       }
     }
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
     $class[] = 'site-map-box-audio';
     $attributes = array('class' => $class);
 
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
   }
 
   return $output;
@@ -270,6 +284,7 @@ function _site_map_audio() {
 function _site_map_video() {
   $output = '';
   $class = array();
+  $options = array();
   if (module_exists('video')) {
     $title = t('Video');
     $output = l(t('Video content'), 'video');
@@ -283,11 +298,12 @@ function _site_map_video() {
         $output = $rss_link . '  ' . $output;
       }
     }
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
     $class[] = 'site-map-box-video';
     $attributes = array('class' => $class);
 
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
   }
 
   return $output;
@@ -298,6 +314,7 @@ function _site_map_video() {
  */
 function _site_map_books() {
   $output = '';
+  $options = array();
   $book_titles = array();
   $mlid = array_filter(variable_get('site_map_show_books', array()));
 
@@ -323,6 +340,7 @@ function _site_map_books() {
         }
       }
     }
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
     if (!$books_expanded && !empty($book_titles)) {
       $output .= theme('item_list', array('items' => $book_titles));
@@ -331,7 +349,7 @@ function _site_map_books() {
     if (!empty($output)) {
       $attributes = array('class' => array('site-map-box-book'));
 
-      $output = theme('site_map_box', array('title' => $title, 'content' => $description . $output, 'attributes' => $attributes));
+      $output = theme('site_map_box', array('title' => $title, 'content' => $description . $output, 'attributes' => $attributes, 'options' => $options));
     }
   }
 
@@ -344,6 +362,7 @@ function _site_map_books() {
 function _site_map_menus() {
   $output = '';
   $class = array();
+  $options = array();
   $mids = array_filter(variable_get('site_map_show_menus', array()));
 
   if (!empty($mids)) {
@@ -357,14 +376,16 @@ function _site_map_menus() {
       $menu_display = _site_map_menu_tree_output($tree);
       $menu_html = drupal_render($menu_display);
       if (!empty($menu_html)) {
-        $title = $menu['title'];
+        $title = t($menu['title']);
         if (module_exists('i18n_string')) {
           $title = i18n_string_plain(array('menu', 'menu', $menu['menu_name'], 'title'), $title);
         }
+        _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
+
         $class[] = 'site-map-box-menu';
         $class[] = 'site-map-box-menu-' . $mid;
         $attributes = array('class' => $class);
-        $output .= theme('site_map_box', array('title' => $title, 'content' => $menu_html, 'attributes' => $attributes));
+        $output .= theme('site_map_box', array('title' => $title, 'content' => $menu_html, 'attributes' => $attributes, 'options' => $options));
       }
     }
   }
@@ -374,11 +395,14 @@ function _site_map_menus() {
 
 function _site_map_faq() {
   $output = '';
+  $options = array();
   if (module_exists('faq')) {
     $title = variable_get('faq_title', t('Frequently Asked Questions'));
     $attributes = array('class' => array('site-map-box-faq'));
     $output = faq_get_faq_list();
-    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
+
+    $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
   }
 
   return $output;
@@ -389,6 +413,7 @@ function _site_map_faq() {
  */
 function _site_map_taxonomys() {
   $output = '';
+  $options = array();
   $vids = array_filter(variable_get('site_map_show_vocabularies', array()));
 
   if (module_exists('taxonomy') && !empty($vids)) {
@@ -399,6 +424,8 @@ function _site_map_taxonomys() {
       }
       $output .= _site_map_taxonomy_tree($voc->vid, $voc->name, $voc->description);
     }
+    _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
+
   }
 
   return $output;
@@ -418,6 +445,7 @@ function _site_map_taxonomys() {
  */
 function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   $output = '';
+  $options = array();
   $class = array();
   if ($vid == variable_get('forum_nav_vocabulary', '')) {
     $title = l($name, 'forum');
@@ -504,12 +532,13 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $output .= "</li>\n</ul>\n";
     }
   }
+  _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
   $class[] = 'site-map-box-terms';
   $class[] = 'site-map-box-terms-' . $vid;
   $attributes = array('class' => $class);
 
-  $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes));
+  $output = theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
 
   return $output;
 }
@@ -623,4 +652,10 @@ function _site_map_menu_tree_output($tree) {
   }
 
   return $build;
+}
+
+function _site_map_set_option(&$options, $option_string, $get_param, $equal_param, $set_string, $set_value) {
+  if (variable_get($option_string, $get_param) == $equal_param) {
+      $options[$set_string] = $set_value;
+  }
 }

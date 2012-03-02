@@ -39,11 +39,12 @@ function theme_site_map_box($variables) {
   $title = $variables['title'];
   $content = $variables['content'];
   $attributes = $variables['attributes'];
+  $options = $variables['options'];
 
   $output = '';
   if (!empty($title) || !empty($content)) {
     $output .= '<div' . drupal_attributes($attributes) . '>';
-    if (!empty($title)) {
+    if (!empty($title) && isset($options['show_titles'])) {
       $output .= '<h2 class="title">' . $title . '</h2>';
     }
     if (!empty($content)) {
@@ -162,6 +163,10 @@ function template_preprocess_site_map(&$variables) {
 
   if (variable_get('site_map_show_front', 1)) {
     $variables['front_page'] = _site_map_front_page();
+  }
+
+  if (variable_get('site_map_show_titles', 1)) {
+    $variables['show_titles'] = TRUE;
   }
 
   if (variable_get('site_map_show_blogs', 1)) {

@@ -38,6 +38,12 @@ function site_map_admin_settings_form() {
     '#default_value' => variable_get('site_map_show_front', 1),
     '#description' => t('When enabled, this option will include the front page in the site map.'),
   );
+  $form['site_map_content']['site_map_show_titles'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show titles'),
+    '#default_value' => variable_get('site_map_show_titles', 1),
+    '#description' => t('When enabled, this option will show titles. Disable to not show section titles.'),
+  );
   if (module_exists('blog')) {
     $form['site_map_content']['site_map_show_blogs'] = array(
       '#type' => 'checkbox',
