@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * site_map.module
@@ -8,12 +7,6 @@
  * Now maintained by Fredrik Jonsson fredrik at combonet dot se
  */
 
-/*
- $options = array();
-  if (variable_get('site_map_show_titles', 1) == 1) {
-      $options['show_titles'] = TRUE;
-  }
-*/
 
 /**
  * Implements hook_permission().
@@ -25,6 +18,7 @@ function site_map_permission() {
     ),
   );
 }
+
 
 /**
  * Implements hook_theme().
@@ -69,6 +63,7 @@ function site_map_theme() {
   );
 }
 
+
 /**
  * Implements hook_menu().
  */
@@ -92,6 +87,7 @@ function site_map_menu() {
   return $items;
 }
 
+
 /**
  * Implements hook_variable_info().
  */
@@ -113,6 +109,7 @@ function site_map_variable_info($options) {
   return $variable;
 }
 
+
 /**
  * Implements hook_block_info().
  */
@@ -123,6 +120,7 @@ function site_map_block_info() {
 
   return $block;
 }
+
 
 /**
  * Implements hook_block_view().
@@ -154,6 +152,7 @@ function site_map_block_view($delta = '') {
   }
 }
 
+
 /**
  * Menu callback for the site map.
  */
@@ -167,6 +166,13 @@ function site_map_page() {
   return theme('site_map');
 }
 
+
+/**
+ * Menu callback for the site map front page.
+ *
+ * @return string
+ *   Returns HTML string for front page site map.
+ */
 function _site_map_front_page() {
   $output = '';
   $class = array();
@@ -195,8 +201,12 @@ function _site_map_front_page() {
   return theme('site_map_box', array('title' => $title, 'content' => $output, 'attributes' => $attributes, 'options' => $options));
 }
 
+
 /**
- * Render the latest blog authors
+ * Render the latest blogs
+ *
+ * @return string
+ *   Returns HTML string of site map for blogs.
  */
 function _site_map_blogs() {
   $output = '';
@@ -253,6 +263,12 @@ function _site_map_blogs() {
   return $output;
 }
 
+/**
+ * Render the latest maps for audio
+ *
+ * @return string
+ *   Returns HTML string of site map for audio.
+ */
 function _site_map_audio() {
   $output = '';
   $class = array();
@@ -281,6 +297,13 @@ function _site_map_audio() {
   return $output;
 }
 
+
+/**
+ * Render the latest maps for video
+ *
+ * @return string
+ *   Returns HTML string of site map for video.
+ */
 function _site_map_video() {
   $output = '';
   $class = array();
@@ -309,8 +332,12 @@ function _site_map_video() {
   return $output;
 }
 
+
 /**
- * Render books
+ * Render the latest maps for books
+ *
+ * @return string
+ *   Returns HTML string of site map for video.
  */
 function _site_map_books() {
   $output = '';
@@ -356,8 +383,12 @@ function _site_map_books() {
   return $output;
 }
 
+
 /**
- * Render menus
+ * Render the latest maps for all the menus
+ *
+ * @return string
+ *   Returns HTML string of site map for menus.
  */
 function _site_map_menus() {
   $output = '';
@@ -393,6 +424,13 @@ function _site_map_menus() {
   return $output;
 }
 
+
+/**
+ * Render the latest maps for faq
+ *
+ * @return string
+ *   Returns HTML string of site map for faq.
+ */
 function _site_map_faq() {
   $output = '';
   $options = array();
@@ -408,8 +446,12 @@ function _site_map_faq() {
   return $output;
 }
 
+
 /**
- * This function can be called from blocks or pages as desired.
+ * Render the latest maps for the taxonomy tree
+ *
+ * @return string
+ *   Returns HTML string of site map for taxonomies.
  */
 function _site_map_taxonomys() {
   $output = '';
@@ -430,6 +472,7 @@ function _site_map_taxonomys() {
 
   return $output;
 }
+
 
 /**
  * Render the taxonomy tree.
@@ -543,6 +586,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   return $output;
 }
 
+
 /**
  * Count the number of published nodes classified by a term.
  *
@@ -568,6 +612,7 @@ function site_map_taxonomy_term_count_nodes($tid) {
   return $count[0];
 }
 
+
 /**
  * This is a clone of the core menu_tree_output() function with the exception
  * of theme('site_map_menu_tree') for theming override reasons.
@@ -581,7 +626,6 @@ function site_map_taxonomy_term_count_nodes($tid) {
  *
  * @param $tree
  *   A data structure representing the tree as returned from menu_tree_data.
- *
  * @return
  *   A structured array to be rendered by drupal_render().
  */
@@ -654,6 +698,23 @@ function _site_map_menu_tree_output($tree) {
   return $build;
 }
 
+
+/**
+ * Sets options based on admin input paramaters for redering.
+ *
+ * @param array $options
+ *   The array of options to the site map theme.
+ * @param string $option_string
+ *   The string index given from the admin form to match.
+ * @param int $get_param
+ *   Parameter number
+ * @param int $equal_param
+ *   Result of param test, 0 or 1.
+ * @param string $set_string
+ *   Index of option to set, or the option name.
+ * @param boolean $set_value
+ *   The option, on or off, or strings or ints for other options.
+ */
 function _site_map_set_option(&$options, $option_string, $get_param, $equal_param, $set_string, $set_value) {
   if (variable_get($option_string, $get_param) == $equal_param) {
       $options[$set_string] = $set_value;

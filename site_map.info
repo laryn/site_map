@@ -2,3 +2,4 @@ name = Site map
 description = Display a site map.
 core = 7.x
 configure = admin/config/search/sitemap
+dependencies[] = menu

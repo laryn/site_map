@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file site-map.tpl.php
  *

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Original author: Nic Ivy

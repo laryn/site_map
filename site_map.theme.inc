@@ -1,11 +1,11 @@
 <?php
-
 /**
  * @file
  * site_map.theme.inc
  *
  * Site map theme functions.
  */
+
 
 /**
  * Returns HTML for a site map feed icon legend.
@@ -19,12 +19,14 @@ function theme_site_map_rss_legend() {
   return $output;
 }
 
+
 /**
  * Preprocesses the variables for theme_site_map_box().
  */
 function template_preprocess_site_map_box(&$variables) {
   $variables['attributes']['class'][] = 'site-map-box';
 }
+
 
 /**
  * Returns HTML for a themed site map box.
@@ -55,6 +57,7 @@ function theme_site_map_box($variables) {
 
   return $output;
 }
+
 
 /**
  * Returns HTML for a feed icon with link.
@@ -94,6 +97,7 @@ function theme_site_map_feed_icon($variables) {
   return $output;
 }
 
+
 /**
  * This is a clone of the core template_preprocess_menu_tree() function with the exception of
  * the site_map specific class name used in the UL that also allow themers to
@@ -104,6 +108,7 @@ function theme_site_map_feed_icon($variables) {
 function template_preprocess_site_map_menu_tree(&$variables) {
   $variables['tree'] = $variables['tree']['#children'];
 }
+
 
 /**
  * This is a clone of the core theme_menu_tree() function with the exception of
@@ -122,6 +127,7 @@ function template_preprocess_site_map_menu_tree(&$variables) {
 function theme_site_map_menu_tree($variables) {
   return '<ul class="site-map-menu">' . $variables['tree'] . '</ul>';
 }
+
 
 /**
  * This is a one by one clone of the core theme_menu_link() function that allows
@@ -145,6 +151,7 @@ function theme_site_map_menu_link(array $variables) {
   $output = l($element['#title'], $element['#href'], $element['#localized_options']);
   return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
+
 
 /**
  * Preprocesses the variables for site-map.tpl.php.
