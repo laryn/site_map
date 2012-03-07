@@ -81,6 +81,12 @@ function site_map_admin_settings_form() {
     '#options' => $menu_options,
     '#multiple' => TRUE,
   );
+  $form['site_map_content']['site_map_show_menus_hidden'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show disabled menu items'),
+    '#default_value' => variable_get('site_map_show_menus_hidden', 0),
+    '#description' => t('When enabled, hidden menu links will also be shown.'),
+  );
   if (module_exists('faq')) {
     $form['site_map_content']['site_map_show_faq'] = array(
       '#type' => 'checkbox',
@@ -153,7 +159,7 @@ function site_map_admin_settings_form() {
     '#options' => array(
       0 => t('None'),
       1 => t('Include on the right side'),
-      2 => t('Include on the left side')
+      2 => t('Include on the left side'),
     ),
     '#description' => t('When enabled, this option will show links to the RSS feeds for each category and blog.'),
   );

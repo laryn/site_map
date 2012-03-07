@@ -31,11 +31,14 @@ function template_preprocess_site_map_box(&$variables) {
 /**
  * Returns HTML for a themed site map box.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - title: The subject of the box.
  *   - content: The content of the box.
  *   - attributes:  Optional attributes for the box.
+ *
+ * @return string
+ *   Returns sitemap display in DIV.
  */
 function theme_site_map_box($variables) {
   $title = $variables['title'];
@@ -62,10 +65,13 @@ function theme_site_map_box($variables) {
 /**
  * Returns HTML for a feed icon with link.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - url: The url of the feed.
  *   - type: The type of feed icon.
+ *
+ * @return string
+ *   Constructs and returns html with feed image icon.
  */
 function theme_site_map_feed_icon($variables) {
   $output = '';
@@ -99,9 +105,10 @@ function theme_site_map_feed_icon($variables) {
 
 
 /**
- * This is a clone of the core template_preprocess_menu_tree() function with the exception of
- * the site_map specific class name used in the UL that also allow themers to
- * override the function only for the site map page.
+ * This is a clone of the core template_preprocess_menu_tree() function
+ * with the exception of the site_map specific class name used in the
+ * UL that also allow themers to override the function only
+ * for the site map page.
  *
  * Preprocesses the rendered tree for theme_site_map_menu_tree().
  */
@@ -117,9 +124,12 @@ function template_preprocess_site_map_menu_tree(&$variables) {
  *
  * Returns HTML for a wrapper for a menu sub-tree.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - tree: An HTML string containing the tree's items.
+ *
+ * @return string
+ *   Returns the html string with the <ul> for the menu tree.
  *
  * @see template_preprocess_menu_tree()
  * @ingroup themeable
@@ -135,9 +145,12 @@ function theme_site_map_menu_tree($variables) {
  *
  * Returns HTML for a menu link and submenu.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: Structured array data for a menu link.
+ *
+ * @return string
+ *   Returns html string for menu link.
  *
  * @ingroup themeable
  */
@@ -193,7 +206,7 @@ function template_preprocess_site_map(&$variables) {
   // Compile the vocabulary trees.
   $variables['taxonomys'] = _site_map_taxonomys();
 
-  // Invoke all custom modules and get themed HTML to be integrated into the site map.
+  // Invoke all custom modules and integrate themed HTML into the site map.
   $additional = module_invoke_all('site_map');
   foreach ($additional as $themed_site_map_code) {
     $variables['additional'] .= $themed_site_map_code;
