@@ -81,6 +81,7 @@ function site_map_admin_settings_form() {
     '#options' => $menu_options,
     '#multiple' => TRUE,
   );
+  // Thanks for fix from  zhuber at https://drupal.org/node/1331104#comment-5200266
   $form['site_map_content']['site_map_show_menus_hidden'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show disabled menu items'),
