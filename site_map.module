@@ -98,7 +98,12 @@ function site_map_variable_info($options) {
     'description' => t('Page title that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
     'default' => 'Site map',
   );
-
+  $variable['site_map_message'] = array(
+    'type' => 'text_format',
+    'title' => t('Site map message'),
+    'description' => t('Message that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
+    'default' => 'The site map provides an overview of all website content.',
+  );
   $variable['site_map_rss_front'] = array(
     'type' => 'string',
     'title' => t('RSS feed for front page', array(), $options),
