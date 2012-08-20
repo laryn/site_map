@@ -3,3 +3,4 @@ description = Display a site map.
 core = 7.x
 configure = admin/config/search/sitemap
 dependencies[] = menu
+files[] = site_map.test
