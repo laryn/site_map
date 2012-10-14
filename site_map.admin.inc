@@ -114,6 +114,12 @@ function site_map_admin_settings_form() {
     '#type' => 'fieldset',
     '#title' => t('Categories settings'),
   );
+  $form['site_map_taxonomy_options']['site_map_show_description'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show category description'),
+    '#default_value' => variable_get('site_map_show_description', 1),
+    '#description' => t('When enabled, this option will show the category description.'),
+  );
   $form['site_map_taxonomy_options']['site_map_show_count'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show node counts by categories'),

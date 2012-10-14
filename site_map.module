@@ -510,7 +510,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
 
   $last_depth = -1;
 
-  $output .= !empty($description) ? '<div class="description">' . filter_xss_admin($description) . "</div>\n" : '';
+  $output .= !empty($description) && variable_get('site_map_show_description', 1) ? '<div class="description">' . filter_xss_admin($description) . "</div>\n" : '';
 
   // taxonomy_get_tree() honors access controls.
   $tree = taxonomy_get_tree($vid);
