@@ -6,8 +6,9 @@
  */
 
 class siteMapTest extends DrupalWebTestCase {
-  /*
+  /**
    * The getInfo() method provides information about the test.
+   *
    * In order for the test to be run, the getInfo() method needs
    * to be implemented.
    */
@@ -20,7 +21,7 @@ class siteMapTest extends DrupalWebTestCase {
   }
 
   /**
-   * Prepares the testing environment
+   * Prepares the testing environment.
    */
   function setUp() {
     parent::setUp('site_map');
@@ -30,7 +31,7 @@ class siteMapTest extends DrupalWebTestCase {
    * Tests that a new node with a menu item gets listed at /sitemap.
    */
   public function testNodeAddition() {
-    // Create user
+    // Create user.
     $this->user = $this->drupalCreateUser(array(
       'administer site configuration',
       'access site map',
@@ -40,7 +41,7 @@ class siteMapTest extends DrupalWebTestCase {
     ));
     $this->drupalLogin($this->user);
 
-    // Configure module to list items of Main menu
+    // Configure module to list items of Main menu.
     $edit = array(
       'site_map_show_menus[main-menu]' => '1',
     );
@@ -48,7 +49,7 @@ class siteMapTest extends DrupalWebTestCase {
                       $edit, t('Save configuration'));
     $this->assertText(t('The configuration options have been saved.'));
 
-    // Create dummy node
+    // Create dummy node.
     $title = $this->randomName(8);
     $edit = array(
       'title' => $title,

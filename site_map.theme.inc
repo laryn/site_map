@@ -105,12 +105,12 @@ function theme_site_map_feed_icon($variables) {
 
 
 /**
+ * Preprocesses the rendered tree for theme_site_map_menu_tree().
+ *
  * This is a clone of the core template_preprocess_menu_tree() function
  * with the exception of the site_map specific class name used in the
  * UL that also allow themers to override the function only
  * for the site map page.
- *
- * Preprocesses the rendered tree for theme_site_map_menu_tree().
  */
 function template_preprocess_site_map_menu_tree(&$variables) {
   $variables['tree'] = $variables['tree']['#children'];
@@ -118,11 +118,11 @@ function template_preprocess_site_map_menu_tree(&$variables) {
 
 
 /**
+ * Returns HTML for a wrapper for a menu sub-tree.
+ *
  * This is a clone of the core theme_menu_tree() function with the exception of
  * the site_map specific class name used in the UL that also allow themers to
  * override the function only for the site map page.
- *
- * Returns HTML for a wrapper for a menu sub-tree.
  *
  * @param array $variables
  *   An associative array containing:
@@ -140,10 +140,10 @@ function theme_site_map_menu_tree($variables) {
 
 
 /**
+ * Returns HTML for a menu link and submenu.
+ *
  * This is a one by one clone of the core theme_menu_link() function that allows
  * custom theming of the site map page items.
- *
- * Returns HTML for a menu link and submenu.
  *
  * @param array $variables
  *   An associative array containing:
