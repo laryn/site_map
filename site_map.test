@@ -5,7 +5,7 @@
  * Tests for the site_map module.
  */
 
-class siteMapTest extends DrupalWebTestCase {
+class SiteMapTest extends DrupalWebTestCase {
   /**
    * The getInfo() method provides information about the test.
    *
@@ -23,7 +23,7 @@ class siteMapTest extends DrupalWebTestCase {
   /**
    * Prepares the testing environment.
    */
-  function setUp() {
+  public function setUp() {
     parent::setUp('site_map');
   }
 

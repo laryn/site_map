@@ -655,7 +655,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
  * @param string $tid
  *   The term's ID.
  *
- *  @return string
+ * @return string
  *   An integer representing a number of nodes. Results are statically cached.
  */
 function site_map_taxonomy_term_count_nodes($tid) {
@@ -769,7 +769,7 @@ function _site_map_menu_tree_output($tree) {
  *   Result of param test, 0 or 1.
  * @param string $set_string
  *   Index of option to set, or the option name.
- * @param boolean $set_value
+ * @param bool $set_value
  *   The option, on or off, or strings or ints for other options.
  */
 function _site_map_set_option(&$options, $option_string, $get_param, $equal_param, $set_string, $set_value) {
