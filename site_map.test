@@ -5,6 +5,9 @@
  * Tests for the site_map module.
  */
 
+/**
+ * Test case class for sitemap tests.
+ */
 class SiteMapTest extends DrupalWebTestCase {
   /**
    * The getInfo() method provides information about the test.
