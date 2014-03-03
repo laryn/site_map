@@ -505,10 +505,10 @@ function _site_map_faq() {
 function _site_map_taxonomys() {
   $output = '';
   $options = array();
-  $vids = array_filter(variable_get('site_map_show_vocabularies', array()));
+  $vnames = array_filter(variable_get('site_map_show_vocabularies', array()));
 
-  if (module_exists('taxonomy') && !empty($vids)) {
-    $result = db_query('SELECT vid, name, description FROM {taxonomy_vocabulary} WHERE vid IN (:vids) ORDER BY weight ASC, name', array(':vids' => $vids));
+  if (module_exists('taxonomy') && !empty($vnames)) {
+    $result = db_query('SELECT vid, name, description FROM {taxonomy_vocabulary} WHERE machine_name IN (:vnames) ORDER BY weight ASC, name', array(':vnames' => $vnames));
     foreach ($result as $voc) {
       if (module_exists('i18n_taxonomy')) {
         $voc->name = i18n_taxonomy_vocabulary_name($voc, $GLOBALS['language']->language);

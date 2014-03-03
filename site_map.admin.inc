@@ -99,7 +99,7 @@ function site_map_admin_settings_form() {
   $vocab_options = array();
   if (module_exists('taxonomy')) {
     foreach (taxonomy_get_vocabularies() as $vocabulary) {
-      $vocab_options[$vocabulary->vid] = $vocabulary->name;
+      $vocab_options[$vocabulary->machine_name] = $vocabulary->name;
     }
   }
   $form['site_map_content']['site_map_show_vocabularies'] = array(
