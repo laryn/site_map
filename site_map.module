@@ -622,6 +622,9 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       }
     }
 
+    // Add an alter hook so other modules can manipulate the taxonomy term output
+    drupal_alter(array('site_map_taxonomy_term', 'site_map_taxonomy_term_' . $term->tid), $term_item, $term);
+
     $output .= $term_item;
 
     // Reset $last_depth in preparation for the next $term.
