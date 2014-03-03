@@ -253,8 +253,8 @@ function _site_map_blogs() {
     $query
       ->condition('n.type', 'blog')
       ->condition('n.status', 1)
-      ->groupBy('u.uid'),
-      ->groupBy('u.name'),
+      ->groupBy('u.uid')
+      ->groupBy('u.name')
       ->orderBy('numitems', 'DESC')
       ->orderBy('u.name', 'ASC')
       ->range(0, 10);
