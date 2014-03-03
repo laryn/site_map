@@ -246,13 +246,21 @@ function _site_map_blogs() {
     $blogs = array();
     $blogs[] = $blog_link;
 
-    $sql = "SELECT DISTINCT u.uid, u.name, count(u.uid) AS numitems
-      FROM {node} n
-      INNER JOIN {users} u ON u.uid = n.uid
-      WHERE n.type = 'blog' AND n.status = 1
-      GROUP BY u.uid, u.name
-      ORDER BY numitems DESC, u.name";
-    $result = db_query_range($sql, 0, 10);
+    $query = db_select('node', 'n');
+    $query->join('users', 'u', 'u.uid = n.uid');
+    $query->fields('u', array('uid', 'name'));
+    $query->addExpression('COUNT(u.uid)', 'numitems');
+    $query
+      ->condition('n.type', 'blog')
+      ->condition('n.status', 1)
+      ->groupBy('u.uid'),
+      ->groupBy('u.name'),
+      ->orderBy('numitems', 'DESC')
+      ->orderBy('u.name', 'ASC')
+      ->range(0, 10);
+    $query->addTag('node_access');
+    $query->distinct();
+    $result = $query->execute();
     foreach ($result as $blog) {
       $blog_item = t('<a href="@url">@name\'s blog</a> (@num_items)', array(
         '@url' => "blog/$blog->uid",
