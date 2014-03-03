@@ -442,6 +442,11 @@ function _site_map_menus() {
       if (module_exists('i18n_menu')) {
         $tree = i18n_menu_localize_tree($tree, $GLOBALS['language']->language);
       }
+
+      // Add an alter hook so other modules can manipulate the menu tree prior to rendering
+      $alter_mid = preg_replace('/[^a-z0-9_]+/', '_', $mid);
+      drupal_alter(array('site_map_menu_tree', 'site_map_menu_tree_' . $alter_mid), $tree, $menu);
+
       $menu_display = _site_map_menu_tree_output($tree);
       $menu_html = drupal_render($menu_display);
       if (!empty($menu_html)) {
