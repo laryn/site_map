@@ -430,12 +430,12 @@ function _site_map_books() {
  */
 function _site_map_menus() {
   $output = '';
-  $class = array();
   $options = array();
   $mids = array_filter(variable_get('site_map_show_menus', array()));
 
   if (!empty($mids)) {
     foreach ($mids as $mid) {
+      $class = array();
       $menu = menu_load($mid);
       // Use menu_tree_all_data to retrieve the expanded tree.
       $tree = menu_tree_all_data($mid);
