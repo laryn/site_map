@@ -49,7 +49,7 @@ function site_map_theme() {
       'file' => 'site_map.theme.inc',
     ),
     'site_map_feed_icon' => array(
-      'variables' => array('url' => NULL, 'type' => 'node'),
+      'variables' => array('url' => NULL, 'name' => NULL, 'type' => 'node'),
       'file' => 'site_map.theme.inc',
     ),
     'site_map_menu_link' => array(
@@ -190,9 +190,9 @@ function _site_map_front_page() {
   $output = l(t('Front page of %sn', array('%sn' => variable_get('site_name', 'Drupal'))), '<front>', array('html' => TRUE));
 
   if (variable_get('site_map_show_rss_links', 1) != 0) {
-    $rss_link = theme('site_map_feed_icon', array('url' => variable_get('site_map_rss_front', 'rss.xml')));
+    $rss_link = theme('site_map_feed_icon', array('url' => variable_get('site_map_rss_front', 'rss.xml'), 'name' => 'front page'));
     if (module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
-      $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => 'crss', 'type' => 'comment'));
+      $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => 'crss', 'name' => 'front page comments', 'type' => 'comment'));
     }
     if (variable_get('site_map_show_rss_links', 1) == 1) {
       $output .= ' ' . $rss_link;
@@ -232,7 +232,7 @@ function _site_map_blogs() {
 
     $blog_link = l(t('All blogs'), 'blog');
     if (variable_get('site_map_show_rss_links', 1) != 0) {
-      $rss_link = theme('site_map_feed_icon', array('url' => 'blog/feed'));
+      $rss_link = theme('site_map_feed_icon', array('url' => 'blog/feed', 'name' => 'all blogs'));
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $blog_link .= ' ' . $rss_link;
       }
@@ -268,7 +268,7 @@ function _site_map_blogs() {
         '@num_items' => $blog->numitems,
       ));
       if (variable_get('site_map_show_rss_links', 1) != 0) {
-        $rss_link = theme('site_map_feed_icon', array('url' => "blog/$blog->uid/feed"));
+        $rss_link = theme('site_map_feed_icon', array('url' => "blog/$blog->uid/feed", 'name' => $blog->name . '\'s blog'));
         if (variable_get('site_map_show_rss_links', 1) == 1) {
           $blog_item .= ' ' . $rss_link;
         }
@@ -308,7 +308,7 @@ function _site_map_audio() {
     $title = t('Audio');
     $output = l(t('Audio content'), 'audio');
     if (variable_get('site_map_show_rss_links', 1) != 0) {
-      $rss_link = theme('site_map_feed_icon', array('url' => 'audio/feed'));
+      $rss_link = theme('site_map_feed_icon', array('url' => 'audio/feed', 'name' => 'audio content'));
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $output .= ' ' . $rss_link;
       }
@@ -348,7 +348,7 @@ function _site_map_video() {
     $title = t('Video');
     $output = l(t('Video content'), 'video');
     if (variable_get('site_map_show_rss_links', 1) != 0) {
-      $rss_link = theme('site_map_feed_icon', array('url' => 'video/feed'));
+      $rss_link = theme('site_map_feed_icon', array('url' => 'video/feed', 'name' => 'video content'));
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $output .= ' ' . $rss_link;
       }
@@ -563,7 +563,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $threshold = variable_get('site_map_term_threshold', 0);
     $forum_link = FALSE;
   }
-  $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array('url' => "crss/vocab/$vid", 'type' => 'comment')) : '');
+  $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array('url' => "crss/vocab/$vid", 'name' => check_plain($name), 'type' => 'comment')) : '');
 
   $last_depth = -1;
 
@@ -613,13 +613,13 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $term_item .= check_plain($term->name);
     }
     if (variable_get('site_map_show_count', 1)) {
-      $term_item .= " ($term->count)";
+      $term_item .= " <span title=\"" . format_plural($term->count, '1 item has this tag', '@count items have this tag') . "\">(" . $term->count . ")</span>";
     }
 
     if (variable_get('site_map_show_rss_links', 1) != 0) {
-      $rss_link = theme('site_map_feed_icon', array('url' => 'taxonomy/term/' . $term->tid . '/feed'));
+      $rss_link = theme('site_map_feed_icon', array('url' => 'taxonomy/term/' . $term->tid . '/feed', 'name' => $term->name));
       if (module_exists('commentrss') && variable_get('commentrss_term', FALSE)) {
-        $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => "crss/term/$term->tid", 'type' => 'comment'));
+        $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => "crss/term/$term->tid", 'type' => 'comment', 'name' => $term->name . ' comments'));
       }
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $term_item .= ' ' . $rss_link;
