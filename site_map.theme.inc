@@ -1,11 +1,11 @@
 <?php
+
 /**
  * @file
  * site_map.theme.inc
  *
  * Site map theme functions.
  */
-
 
 /**
  * Returns HTML for a site map feed icon legend.
@@ -96,7 +96,12 @@ function theme_site_map_feed_icon($variables) {
   }
 
   if (!empty($variables['url'])) {
-    $output = l($output, $variables['url'], array('attributes' => array('class' => array('feed-link'), 'title' => t('Syndicated feed for') . ' ' . $variables['name']), 'html' => TRUE));
+    $output = l($output, $variables['url'], array(
+        'attributes' => array(
+          'class' => array('feed-link'),
+          'title' => t('Syndicated feed for') . ' ' . $variables['name'],
+        ),
+        'html' => TRUE));
   }
 
   return $output;
