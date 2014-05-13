@@ -190,9 +190,16 @@ function _site_map_front_page() {
   $output = l(t('Front page of %sn', array('%sn' => variable_get('site_name', 'Drupal'))), '<front>', array('html' => TRUE));
 
   if (variable_get('site_map_show_rss_links', 1) != 0) {
-    $rss_link = theme('site_map_feed_icon', array('url' => variable_get('site_map_rss_front', 'rss.xml'), 'name' => 'front page'));
+    $rss_link = theme('site_map_feed_icon', array(
+        'url' => variable_get('site_map_rss_front', 'rss.xml'),
+        'name' => 'front page',
+      ));
     if (module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
-      $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => 'crss', 'name' => 'front page comments', 'type' => 'comment'));
+      $rss_link .= ' ' . theme('site_map_feed_icon', array(
+          'url' => 'crss',
+          'name' => 'front page comments',
+          'type' => 'comment',
+        ));
     }
     if (variable_get('site_map_show_rss_links', 1) == 1) {
       $output .= ' ' . $rss_link;
@@ -451,7 +458,8 @@ function _site_map_menus() {
         $tree = i18n_menu_localize_tree($tree, $GLOBALS['language']->language);
       }
 
-      // Add an alter hook so other modules can manipulate the menu tree prior to rendering
+      // Add an alter hook so that other modules can manipulate the
+      // menu tree prior to rendering.
       $alter_mid = preg_replace('/[^a-z0-9_]+/', '_', $mid);
       drupal_alter(array('site_map_menu_tree', 'site_map_menu_tree_' . $alter_mid), $tree, $menu);
 
@@ -619,7 +627,11 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     if (variable_get('site_map_show_rss_links', 1) != 0) {
       $rss_link = theme('site_map_feed_icon', array('url' => 'taxonomy/term/' . $term->tid . '/feed', 'name' => $term->name));
       if (module_exists('commentrss') && variable_get('commentrss_term', FALSE)) {
-        $rss_link .= ' ' . theme('site_map_feed_icon', array('url' => "crss/term/$term->tid", 'type' => 'comment', 'name' => $term->name . ' comments'));
+        $rss_link .= ' ' . theme('site_map_feed_icon', array(
+            'url' => "crss/term/$term->tid",
+            'type' => 'comment',
+            'name' => $term->name . ' comments',
+          ));
       }
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $term_item .= ' ' . $rss_link;
@@ -630,7 +642,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       }
     }
 
-    // Add an alter hook so other modules can manipulate the taxonomy term output
+    // Add an alter hook for modules to manipulate the taxonomy term output.
     drupal_alter(array('site_map_taxonomy_term', 'site_map_taxonomy_term_' . $term->tid), $term_item, $term);
 
     $output .= $term_item;
