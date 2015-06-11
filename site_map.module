@@ -86,6 +86,7 @@ function site_map_menu() {
   );
   $items['sitemap'] = array(
     'title' => 'Site map',
+    'title callback' => '_site_map_title',
     'description' => 'Display a site map with RSS feeds.',
     'page callback' => 'site_map_page',
     'access arguments' => array('access site map'),
@@ -95,6 +96,21 @@ function site_map_menu() {
   return $items;
 }
 
+/**
+ * Title callback for the sitemap page
+ *
+ * @param string $default
+ *   The default title that hook_menu provides
+ * @return string
+ *   The actual title of the page (customized or not)
+ */
+function _site_map_title($default) {
+  if ($custom = variable_get('site_map_page_title', FALSE)) {
+    return $custom;
+  }
+
+  return $default;
+}
 
 /**
  * Implements hook_variable_info().
