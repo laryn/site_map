@@ -73,17 +73,16 @@ function site_map_theme() {
  */
 function site_map_menu() {
   $items['admin/config/search/sitemap'] = array(
-    'title' => 'Site map',
-    'description' => 'Control what should be displayed on the site map.',
+    'title' => t('Site map'),
+    'description' => t('Control what should be displayed on the site map.'),
     'page callback' => 'drupal_get_form',
     'page arguments' => array('site_map_admin_settings_form'),
     'access arguments' => array('administer site configuration'),
     'file' => 'site_map.admin.inc',
   );
   $items['sitemap'] = array(
-    'title' => 'Site map',
     'title callback' => '_site_map_title',
-    'description' => 'Display a site map with RSS feeds.',
+    'description' => t('Display a site map with RSS feeds.'),
     'page callback' => 'site_map_page',
     'access arguments' => array('access site map'),
     'type' => MENU_SUGGESTED_ITEM,
@@ -96,16 +95,14 @@ function site_map_menu() {
  * Title callback for the sitemap page
  *
  * @param string $default
- *   The default title that hook_menu provides
+ *   The default title that hook_menu provides.
  * @return string
- *   The actual title of the page (customized or not)
+ *   The actual title of the page (customized or not).
  */
 function _site_map_title($default) {
-  if ($custom = variable_get('site_map_page_title', FALSE)) {
-    return $custom;
-  }
-
-  return $default;
+  // If there's a variable set, overriding the translatable title, use it.
+  // Otherwise, use the built-in one or one of its translations.
+  return variable_get('site_map_page_title', t('Site map'));
 }
 
 /**
@@ -115,14 +112,14 @@ function site_map_variable_info($options) {
   $variable['site_map_page_title'] = array(
     'type' => 'string',
     'title' => t('Site map title', array(), $options),
-    'description' => t('Page title that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
-    'default' => 'Site map',
+    'description' => t('Page title that will be used on the <a href="@link">site map page</a>. It should only be set to override the translatable built-in "Site map" title. Note: If you set something here, the title will no longer be translatable.', array('@link' => url('sitemap'))),
+    'default' => '',
   );
   $variable['site_map_message'] = array(
     'type' => 'text_format',
     'title' => t('Site map message'),
     'description' => t('Message that will be used on the <a href="@link">site map page</a>.', array('@link' => url('sitemap'))),
-    'default' => 'The site map provides an overview of all website content.',
+    'default' => t('The site map provides an overview of all website content.'),
   );
   $variable['site_map_show_menus'] = array(
     'type' => 'string',
