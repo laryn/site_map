@@ -99,10 +99,11 @@ function site_map_menu() {
  * @return string
  *   The actual title of the page (customized or not).
  */
-function _site_map_title($default) {
+function _site_map_title($default = NULL) {
   // If there's a variable set, overriding the translatable title, use it.
   // Otherwise, use the built-in one or one of its translations.
-  return variable_get('site_map_page_title', t('Site map'));
+  $var = variable_get('site_map_page_title', '');
+  return (strlen($var)) ? $var : t('Site map');
 }
 
 /**
@@ -185,7 +186,7 @@ function site_map_block_view($delta = '') {
  * Menu callback for the site map.
  */
 function site_map_page() {
-  drupal_set_title(variable_get('site_map_page_title', t('Site map')));
+  drupal_set_title(_site_map_title());
 
   if (variable_get('site_map_css', 0) != 1) {
     drupal_add_css(drupal_get_path('module', 'site_map') . '/site_map.theme.css');
