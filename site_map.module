@@ -596,12 +596,28 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
 
   $output .= !empty($description) && variable_get('site_map_show_description', 1) ? '<div class="description">' . filter_xss_admin($description) . "</div>\n" : '';
 
+  // Get the depth.
   $site_map_categories_depth = variable_get('site_map_categories_depth') ? variable_get('site_map_categories_depth') : NULL;
   if ($site_map_categories_depth == 'all') {
     $site_map_categories_depth = NULL;
   }
-  // taxonomy_get_tree() honors access controls.
-  $tree = taxonomy_get_tree($vid, 0, $site_map_categories_depth);
+
+  // Get the tree in a form that respects access control and translations.
+  if (module_exists('i18n_taxonomy')) {
+    // Taxonomy Translation.
+    $tree = i18n_taxonomy_get_tree($vid, $GLOBALS['language']->language, 0, $site_map_categories_depth);
+  }
+  else if (module_exists('entity_translation')) {
+    // Entity Translation.
+    // Setting the last parameter has performance implications, but adds
+    // proper translation support: https://www.drupal.org/node/2418629.
+    $tree = taxonomy_get_tree($vid, 0, $site_map_categories_depth, TRUE);
+  }
+  else {
+    // If we don't care about translation, there's no need to lose performance.
+    $tree = taxonomy_get_tree($vid, 0, $site_map_categories_depth);
+  }
+
   foreach ($tree as $term) {
     $term->count = site_map_taxonomy_term_count_nodes($term->tid);
     if ($term->count <= $threshold) {
