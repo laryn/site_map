@@ -466,8 +466,14 @@ function _site_map_books() {
 function _site_map_menus() {
   $output = '';
   $options = array();
+
+  // Get the list of menus we'll be displaying.
   $mids = array_filter(variable_get('site_map_show_menus', array()));
 
+  // Allow other modules to alter it.
+  drupal_alter('site_map_menu_list', $mids);
+
+  // Iterate through each menu to render it.
   if (!empty($mids)) {
     foreach ($mids as $mid) {
       $class = array();
