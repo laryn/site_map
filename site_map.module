@@ -293,6 +293,9 @@ function _site_map_blogs() {
     $query->distinct();
     $result = $query->execute();
     foreach ($result as $blog) {
+      if($blog->uid == 0) {
+        $blog->name = t('Anonymous');
+      }
       $blog_item = t('<a href="@url">@name\'s blog</a> (@num_items)', array(
         '@url' => "blog/$blog->uid",
         '@name' => $blog->name,
