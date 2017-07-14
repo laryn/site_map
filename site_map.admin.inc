@@ -51,6 +51,12 @@ function site_map_admin_settings_form() {
     '#default_value' => variable_get('site_map_show_titles', 1),
     '#description' => t('When enabled, this option will show titles. Disable to not show section titles.'),
   );
+  $form['site_map_content']['site_map_show_node_titles'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show page titles instead of menu link titles'),
+    '#default_value' => variable_get('site_map_show_node_titles'),
+    '#description' => t('When enabled, this option will show the actual page title instead of the menu link title.'),
+  );
   if (module_exists('blog')) {
     $form['site_map_content']['site_map_show_blogs'] = array(
       '#type' => 'checkbox',

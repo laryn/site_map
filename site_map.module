@@ -818,6 +818,20 @@ function _site_map_menu_tree_output($tree) {
     $element['#attributes']['class'] = $class;
     $element['#title'] = $data['link']['title'];
     $element['#href'] = $data['link']['href'];
+    $element['#title'] = $data['link']['title'];
+
+    if (variable_get('site_map_show_node_titles', 1) == 1) {
+      if (strpos($element['#href'], 'node/') !== FALSE) {
+        $url = $element['#href'];
+        $nid = basename($url);
+        $node = node_load($nid);
+
+        if (isset($node->title)) {
+          $element['#title'] = $node->title;
+        }
+      }
+    }
+
     $element['#localized_options'] = !empty($data['link']['localized_options']) ? $data['link']['localized_options'] : array();
     $element['#below'] = $data['below'] ? _site_map_menu_tree_output($data['below']) : $data['below'];
     $element['#original_link'] = $data['link'];
