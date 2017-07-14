@@ -151,6 +151,7 @@ function site_map_block_info() {
   // Do no caching because $feedurl is different for blogs.
   $blocks['syndicate']['cache'] = DRUPAL_NO_CACHE;
 
+  $block['site_map']['info'] = t('Site map');
   return $block;
 }
 
@@ -179,6 +180,10 @@ function site_map_block_view($delta = '') {
           'title' => t('View the site map to see more RSS feeds.'),
         ));
         break;
+      case 'site_map':
+        $block['subject'] = _site_map_title();
+        $block['content'] = site_map_content();
+        break;
     }
 
     return $block;
@@ -192,6 +197,13 @@ function site_map_block_view($delta = '') {
 function site_map_page() {
   drupal_set_title(_site_map_title());
 
+  return site_map_content();
+}
+
+/**
+ * The content of the site map page.
+ */
+function site_map_content() {
   if (variable_get('site_map_css', 0) != 1) {
     drupal_add_css(drupal_get_path('module', 'site_map') . '/site_map.theme.css');
   }
