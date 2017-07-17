@@ -9,6 +9,7 @@
  * Test case class for sitemap tests.
  */
 class SiteMapTest extends DrupalWebTestCase {
+
   /**
    * The getInfo() method provides information about the test.
    *
@@ -62,8 +63,9 @@ class SiteMapTest extends DrupalWebTestCase {
     $this->drupalPost('node/add/page',
                       $edit, t('Save'));
 
-    // Check that dummy node is listed at /sitemap
+    // Check that dummy node is listed at /sitemap.
     $this->drupalGet('sitemap');
     $this->assertText($title);
   }
+
 }

@@ -19,14 +19,12 @@ function theme_site_map_rss_legend() {
   return $output;
 }
 
-
 /**
  * Preprocesses the variables for theme_site_map_box().
  */
 function template_preprocess_site_map_box(&$variables) {
   $variables['attributes']['class'][] = 'site-map-box';
 }
-
 
 /**
  * Returns HTML for a themed site map box.
@@ -39,8 +37,11 @@ function template_preprocess_site_map_box(&$variables) {
  *
  * @return string
  *   Returns sitemap display in DIV.
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_site_map_box($variables) {
+  // @codingStandardsIgnoreEnd
   $title = $variables['title'];
   $content = $variables['content'];
   $attributes = $variables['attributes'];
@@ -61,7 +62,6 @@ function theme_site_map_box($variables) {
   return $output;
 }
 
-
 /**
  * Returns HTML for a feed icon with link.
  *
@@ -73,8 +73,11 @@ function theme_site_map_box($variables) {
  *
  * @return string
  *   Constructs and returns html with feed image icon.
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_site_map_feed_icon($variables) {
+  // @codingStandardsIgnoreEnd
   $output = '';
 
   switch ($variables['type']) {
@@ -82,7 +85,7 @@ function theme_site_map_feed_icon($variables) {
       $output = theme('image', array(
         'path' => drupal_get_path('module', 'site_map') . '/feed-small.png',
         'alt' => t('Syndicated feed icon'),
-        )
+      )
       );
       break;
 
@@ -90,23 +93,23 @@ function theme_site_map_feed_icon($variables) {
       $output = theme('image', array(
         'path' => drupal_get_path('module', 'site_map') . '/feed-small-comment.png',
         'alt' => t('Syndicated feed icon'),
-        )
+      )
       );
       break;
   }
 
   if (!empty($variables['url'])) {
     $output = l($output, $variables['url'], array(
-        'attributes' => array(
-          'class' => array('feed-link'),
-          'title' => t('Syndicated feed for') . ' ' . $variables['name'],
-        ),
-        'html' => TRUE));
+      'attributes' => array(
+        'class' => array('feed-link'),
+        'title' => t('Syndicated feed for') . ' ' . $variables['name'],
+      ),
+      'html' => TRUE,
+    ));
   }
 
   return $output;
 }
-
 
 /**
  * Preprocesses the rendered tree for theme_site_map_menu_tree().
@@ -119,7 +122,6 @@ function theme_site_map_feed_icon($variables) {
 function template_preprocess_site_map_menu_tree(&$variables) {
   $variables['tree'] = $variables['tree']['#children'];
 }
-
 
 /**
  * Returns HTML for a wrapper for a menu sub-tree.
@@ -137,11 +139,13 @@ function template_preprocess_site_map_menu_tree(&$variables) {
  *
  * @see template_preprocess_menu_tree()
  * @ingroup themeable
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_site_map_menu_tree($variables) {
+  // @codingStandardsIgnoreEnd
   return '<ul class="site-map-menu">' . $variables['tree'] . '</ul>';
 }
-
 
 /**
  * Returns HTML for a menu link and submenu.
@@ -169,7 +173,6 @@ function theme_site_map_menu_link(array $variables) {
   return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
 
-
 /**
  * Preprocesses the variables for site-map.tpl.php.
  *
@@ -194,7 +197,7 @@ function template_preprocess_site_map(&$variables) {
   asort($site_map_order);
 
   foreach ($site_map_order as $content => $weight) {
-    // Get type of content
+    // Get type of content.
     $type = substr($content, 0, strpos($content, '_'));
     $id = substr($content, strpos($content, '_') + 1);
     if (empty($type)) {
@@ -208,17 +211,20 @@ function template_preprocess_site_map(&$variables) {
           $variables['site_map'] .= _site_map_front_page();
         }
         break;
+
       case 'blogs':
         if (variable_get('site_map_show_blogs', 1)) {
           $variables['site_map'] .= _site_map_blogs();
         }
         break;
+
       case 'books':
         $books = variable_get('site_map_show_books', array());
         if (!empty($books)) {
           $variables['site_map'] .= _site_map_books();
         }
         break;
+
       case 'menus':
         // Get the list of menus we'll be displaying.
         $menus = variable_get('site_map_show_menus', array());
@@ -228,11 +234,13 @@ function template_preprocess_site_map(&$variables) {
           $variables['site_map'] .= _site_map_menus($id);
         }
         break;
+
       case 'faq':
         if (variable_get('site_map_show_faq', 0)) {
           $variables['site_map'] .= _site_map_faq();
         }
         break;
+
       case 'vocabularies':
         $vocabulary = taxonomy_vocabulary_machine_name_load($id);
         $vocabularies = variable_get('site_map_show_vocabularies', array());
@@ -255,13 +263,16 @@ function template_preprocess_site_map(&$variables) {
  *
  * Copied from the core theme_filter_admin_format_filter_order() function.
  *
- * @param $variables
+ * @param array $variables
  *   An associative array containing:
  *   - element: A render element representing the form.
  *
  * @ingroup themeable
+ *
+ * @codingStandardsIgnoreStart
  */
 function theme_site_map_order($variables) {
+  // @codingStandardsIgnoreEnd
   $element = $variables['element'];
 
   // Site map order (tabledrag).
@@ -279,7 +290,7 @@ function theme_site_map_order($variables) {
   $output = drupal_render_children($element);
   $output .= theme('table', array(
     'rows' => $rows,
-    'attributes' => array('id' => 'site-map-order')
+    'attributes' => array('id' => 'site-map-order'),
   ));
   drupal_add_tabledrag('site-map-order', 'order', 'sibling', 'site-map-order-weight', NULL, NULL, TRUE);
 

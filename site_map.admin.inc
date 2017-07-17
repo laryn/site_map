@@ -1,8 +1,11 @@
 <?php
+
 /**
  * @file
+ * Admin functions.
+ *
  * Original author: Nic Ivy
- * Now maintained by by Fredrik Jonsson fredrik at combonet dot se
+ * Now maintained by by Fredrik Jonsson fredrik at combonet dot se.
  */
 
 /**

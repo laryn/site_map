@@ -49,7 +49,7 @@ There is a "depth" setting on the Site map settings page where you can adjust
 how site map constructs the term links.
 
 For making Site map build the same path that Pathauto per default generates
-alias for you should set this to "-1" I belive.
+alias for you should set this to "-1" I believe.
 
 
 Last updated:

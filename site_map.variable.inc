@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Variable module integration for the Site Map module.

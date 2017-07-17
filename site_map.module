@@ -1,12 +1,12 @@
 <?php
+
 /**
  * @file
  * site_map.module
  *
  * Original author: Nic Ivy
- * Now maintained by Fredrik Jonsson fredrik at combonet dot se
+ * Now maintained by Fredrik Jonsson fredrik at combonet dot se.
  */
-
 
 /**
  * Implements hook_permission().
@@ -21,7 +21,6 @@ function site_map_permission() {
     ),
   );
 }
-
 
 /**
  * Implements hook_theme().
@@ -74,14 +73,13 @@ function site_map_theme() {
   );
 }
 
-
 /**
  * Implements hook_menu().
  */
 function site_map_menu() {
   $items['admin/config/search/sitemap'] = array(
-    'title' => t('Site map'),
-    'description' => t('Control what should be displayed on the site map.'),
+    'title' => 'Site map',
+    'description' => 'Control what should be displayed on the site map.',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('site_map_admin_settings_form'),
     'access arguments' => array('administer site map'),
@@ -89,7 +87,7 @@ function site_map_menu() {
   );
   $items['sitemap'] = array(
     'title callback' => '_site_map_title',
-    'description' => t('Display a site map with RSS feeds.'),
+    'description' => 'Display a site map with RSS feeds.',
     'page callback' => 'site_map_page',
     'access arguments' => array('access site map'),
     'type' => MENU_SUGGESTED_ITEM,
@@ -99,10 +97,11 @@ function site_map_menu() {
 }
 
 /**
- * Title callback for the sitemap page
+ * Title callback for the sitemap page.
  *
  * @param string $default
  *   The default title that hook_menu provides.
+ *
  * @return string
  *   The actual title of the page (customized or not).
  */
@@ -118,7 +117,9 @@ function _site_map_title($default = NULL) {
  */
 function site_map_block_info() {
   $block['syndicate']['info'] = t('Syndicate (site map)');
+  
   // Do no caching because $feedurl is different for blogs.
+  // @codingStandardsIgnoreLine
   $blocks['syndicate']['cache'] = DRUPAL_NO_CACHE;
 
   $block['site_map']['info'] = t('Site map');
@@ -149,6 +150,7 @@ function site_map_block_view($delta = '') {
           'title' => t('View the site map to see more RSS feeds.'),
         ));
         break;
+
       case 'site_map':
         $block['subject'] = _site_map_title();
         $block['content'] = site_map_content();
@@ -158,7 +160,6 @@ function site_map_block_view($delta = '') {
     return $block;
   }
 }
-
 
 /**
  * Menu callback for the site map.
@@ -180,7 +181,6 @@ function site_map_content() {
   return theme('site_map');
 }
 
-
 /**
  * Menu callback for the site map front page.
  *
@@ -196,15 +196,15 @@ function _site_map_front_page() {
 
   if (variable_get('site_map_show_rss_links', 1) != 0) {
     $rss_link = theme('site_map_feed_icon', array(
-        'url' => variable_get('site_map_rss_front', 'rss.xml'),
-        'name' => 'front page',
-      ));
+      'url' => variable_get('site_map_rss_front', 'rss.xml'),
+      'name' => 'front page',
+    ));
     if (module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
       $rss_link .= ' ' . theme('site_map_feed_icon', array(
-          'url' => 'crss',
-          'name' => 'front page comments',
-          'type' => 'comment',
-        ));
+        'url' => 'crss',
+        'name' => 'front page comments',
+        'type' => 'comment',
+      ));
     }
     if (variable_get('site_map_show_rss_links', 1) == 1) {
       $output .= ' ' . $rss_link;
@@ -226,7 +226,6 @@ function _site_map_front_page() {
     'options' => $options,
   ));
 }
-
 
 /**
  * Render the latest blogs.
@@ -274,7 +273,7 @@ function _site_map_blogs() {
     $query->distinct();
     $result = $query->execute();
     foreach ($result as $blog) {
-      if($blog->uid == 0) {
+      if ($blog->uid == 0) {
         $blog->name = t('Anonymous');
       }
       $blog_item = t('<a href="@url">@name\'s blog</a> (@num_items)', array(
@@ -348,7 +347,6 @@ function _site_map_audio() {
   return $output;
 }
 
-
 /**
  * Render the latest maps for video.
  *
@@ -388,7 +386,6 @@ function _site_map_video() {
   return $output;
 }
 
-
 /**
  * Render the latest maps for books.
  *
@@ -406,7 +403,7 @@ function _site_map_books() {
     $title = t('Books');
     $description = '<div class="description">' . t('Books at %sn.', array('%sn' => variable_get('site_name', 'Drupal'))) . '</div>';
 
-    foreach (book_get_books() as $book_id => $book) {
+    foreach (book_get_books() as $book) {
       if (in_array($book['mlid'], $mlid)) {
         // Use menu_tree_all_data to retrieve the expanded tree.
         $tree = menu_tree_all_data($book['menu_name']);
@@ -444,7 +441,6 @@ function _site_map_books() {
   return $output;
 }
 
-
 /**
  * Render the latest maps for all the menus.
  *
@@ -472,6 +468,7 @@ function _site_map_menus($mid) {
     $menu_display = _site_map_menu_tree_output($tree);
     $menu_html = drupal_render($menu_display);
     if (!empty($menu_html)) {
+      // @codingStandardsIgnoreLine
       $title = t($menu['title']);
       if (module_exists('i18n_string')) {
         $m_array = array('menu', 'menu', $menu['menu_name'], 'title');
@@ -493,7 +490,6 @@ function _site_map_menus($mid) {
 
   return $output;
 }
-
 
 /**
  * Render the latest maps for faq.
@@ -521,7 +517,6 @@ function _site_map_faq() {
   return $output;
 }
 
-
 /**
  * Render the latest maps for the taxonomy tree.
  *
@@ -543,7 +538,6 @@ function _site_map_taxonomys($voc) {
 
   return $output;
 }
-
 
 /**
  * Render the taxonomy tree.
@@ -568,11 +562,16 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $forum_link = TRUE;
   }
   else {
+    // @codingStandardsIgnoreLine
     $title = $name ? check_plain(t($name)) : '';
     $threshold = variable_get('site_map_term_threshold', 0);
     $forum_link = FALSE;
   }
-  $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array('url' => "crss/vocab/$vid", 'name' => check_plain($name), 'type' => 'comment')) : '');
+  $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array(
+    'url' => "crss/vocab/$vid",
+    'name' => check_plain($name),
+    'type' => 'comment',
+  )) : '');
 
   $last_depth = -1;
 
@@ -583,7 +582,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   if ($site_map_categories_depth == 'all') {
     $site_map_categories_depth = NULL;
   }
-  
+
   $link_empty = variable_get('site_map_link_empty', FALSE);
 
   // Get the tree in a form that respects access control and translations.
@@ -591,7 +590,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     // Taxonomy Translation.
     $tree = i18n_taxonomy_get_tree($vid, $GLOBALS['language']->language, 0, $site_map_categories_depth);
   }
-  else if (module_exists('entity_translation')) {
+  elseif (module_exists('entity_translation')) {
     // Entity Translation.
     // Setting the last parameter has performance implications, but adds
     // proper translation support: https://www.drupal.org/node/2418629.
@@ -647,10 +646,10 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
       $rss_link = theme('site_map_feed_icon', array('url' => 'taxonomy/term/' . $term->tid . '/feed', 'name' => $term->name));
       if (module_exists('commentrss') && variable_get('commentrss_term', FALSE)) {
         $rss_link .= ' ' . theme('site_map_feed_icon', array(
-            'url' => "crss/term/$term->tid",
-            'type' => 'comment',
-            'name' => $term->name . ' comments',
-          ));
+          'url' => "crss/term/$term->tid",
+          'type' => 'comment',
+          'name' => $term->name . ' comments',
+        ));
       }
       if (variable_get('site_map_show_rss_links', 1) == 1) {
         $term_item .= ' ' . $rss_link;
@@ -692,7 +691,6 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   return $output;
 }
 
-
 /**
  * Count the number of published nodes classified by a term.
  *
@@ -718,7 +716,6 @@ function site_map_taxonomy_term_count_nodes($tid) {
   return $count[0];
 }
 
-
 /**
  * Returns a rendered menu tree.
  *
@@ -735,8 +732,11 @@ function site_map_taxonomy_term_count_nodes($tid) {
  *
  * @return array
  *   A structured array to be rendered by drupal_render().
+ *
+ * @codingStandardsIgnoreStart
  */
 function _site_map_menu_tree_output($tree) {
+  // @codingStandardsIgnoreEnd
   $build = array();
   $items = array();
 
@@ -820,24 +820,26 @@ function _site_map_menu_tree_output($tree) {
   return $build;
 }
 
-
 /**
- * Sets options based on admin input paramaters for redering.
+ * Sets options based on admin input parameters for redering.
  *
  * @param array $options
  *   The array of options to the site map theme.
  * @param string $option_string
  *   The string index given from the admin form to match.
  * @param int $get_param
- *   Parameter number
+ *   Parameter number.
  * @param int $equal_param
  *   Result of param test, 0 or 1.
  * @param string $set_string
  *   Index of option to set, or the option name.
  * @param bool $set_value
  *   The option, on or off, or strings or ints for other options.
+ *
+ * @codingStandardsIgnoreStart
  */
 function _site_map_set_option(&$options, $option_string, $get_param, $equal_param, $set_string, $set_value) {
+  // @codingStandardsIgnoreEnd
   if (variable_get($option_string, $get_param) == $equal_param) {
     $options[$set_string] = $set_value;
   }
