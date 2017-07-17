@@ -36,7 +36,7 @@ class SiteMapTest extends DrupalWebTestCase {
   public function testNodeAddition() {
     // Create user.
     $this->user = $this->drupalCreateUser(array(
-      'administer site configuration',
+      'administer site map',
       'access site map',
       'administer menu',
       'administer nodes',
