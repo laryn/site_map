@@ -583,6 +583,8 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   if ($site_map_categories_depth == 'all') {
     $site_map_categories_depth = NULL;
   }
+  
+  $link_empty = variable_get('site_map_link_empty', FALSE);
 
   // Get the tree in a form that respects access control and translations.
   if (module_exists('i18n_taxonomy')) {
@@ -631,7 +633,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     if ($forum_link) {
       $term_item .= l($term->name, 'forum/' . $term->tid, array('attributes' => array('title' => $term->description)));
     }
-    elseif ($term->count) {
+    elseif ($link_empty || $term->count) {
       $term_item .= l($term->name, 'taxonomy/term/' . $term->tid, array('attributes' => array('title' => $term->description)));
     }
     else {

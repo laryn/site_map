@@ -168,6 +168,12 @@ function site_map_admin_settings_form() {
     '#default_value' => variable_get('site_map_show_count', 1),
     '#description' => t('When enabled, this option will show the number of nodes in each taxonomy term.'),
   );
+  $form['site_map_taxonomy_options']['site_map_link_empty'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Create links for empty categories'),
+    '#default_value' => variable_get('site_map_link_empty', 0),
+    '#description' => t('When enabled, this option will create links even for taxonomy term without any node.'),
+  );
   $form['site_map_taxonomy_options']['site_map_categories_depth'] = array(
     '#type' => 'textfield',
     '#title' => t('Categories depth'),
