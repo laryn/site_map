@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Theme implementation to display the site map.
@@ -13,13 +14,14 @@
  * - $faq:
  * - $taxonomys:
  * - $additional:
+ * - $classes:
  *
  * @see template_preprocess()
  * @see template_preprocess_site_map()
  */
 ?>
 
-<div id="site-map">
+<div id="site-map" class="<?php print $classes; ?>">
   <?php if($message): ?>
     <div class="site-map-message">
       <?php print $message; ?>
