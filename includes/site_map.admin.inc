@@ -153,7 +153,7 @@ function site_map_admin_settings_form() {
       '#weight' => isset($site_map_order_defaults[$content_id]) ? $site_map_order_defaults[$content_id] : -50,
     );
   }
-  $form['#attached']['js'][] = drupal_get_path('module', 'site_map') . '/site_map.admin.js';
+  $form['#attached']['js'][] = drupal_get_path('module', 'site_map') . '/js/site_map.admin.js';
 
   $form['site_map_taxonomy_options'] = array(
     '#type' => 'fieldset',
