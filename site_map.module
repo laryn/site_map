@@ -40,7 +40,7 @@ function site_map_theme() {
         'additional' => NULL,
       ),
       'template' => 'site-map',
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_box' => array(
       'variables' => array(
@@ -48,27 +48,27 @@ function site_map_theme() {
         'content' => NULL,
         'attributes' => array(),
       ),
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_feed_icon' => array(
       'variables' => array('url' => NULL, 'name' => NULL, 'type' => 'node'),
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_menu_link' => array(
       'render element' => 'element',
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_menu_tree' => array(
       'render element' => 'tree',
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_rss_legend' => array(
       'variables' => array(),
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
     'site_map_order' => array(
       'render element' => 'element',
-      'file' => 'site_map.theme.inc',
+      'file' => 'includes/site_map.theme.inc',
     ),
   );
 }
@@ -83,7 +83,7 @@ function site_map_menu() {
     'page callback' => 'drupal_get_form',
     'page arguments' => array('site_map_admin_settings_form'),
     'access arguments' => array('administer site map'),
-    'file' => 'site_map.admin.inc',
+    'file' => 'includes/site_map.admin.inc',
   );
   $items['sitemap'] = array(
     'title callback' => '_site_map_title',
