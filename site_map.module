@@ -9,6 +9,40 @@
  */
 
 /**
+ * Implements hook_help().
+ */
+function site_map_help($path, $arg) {
+
+  switch ($path) {
+    case 'admin/help#site_map':
+      $output = '<h3>' . t('About') . '</h3>';
+      $output .= '<p>' . t('Site Map provides a site map that gives visitors an overview of your site. It can also display the RSS feeds for all blogs and terms. Drupal generates the RSS feeds automatically but few seems to be aware that they exist.') . '</p>';
+      $output .= '<p>' . t('The site map can display the following items:') . '</p>';
+      $output .= '<ul>';
+      $output .= '<li>' . t('A message to be displayed above the site map') . '</li>';
+      $output .= '<li>' . t('The front page.') . '</li>';
+      $output .= '<li>' . t('The latest blogs.') . '</li>';
+      $output .= '<li>' . t('Any books that optionally will be displayed fully expanded.') . '</li>';
+      $output .= '<li>' . t('Any menus that will be displayed fully expanded.') . '</li>';
+      $output .= '<li>' . t('Any vocabulary with all the terms expanded. Optionally with node counts and RSS feeds.') . '</li>';
+      $output .= '<li>' . t('Display comment RSS links if the Comment RSS module is installed.') . '</li>';
+      $output .= '<li>' . t('A syndication block, the "more" link goes to the site map.') . '</li>';
+      $output .= '</ul>';
+      $output .= '<h3>' . t('Usage') . '</h3>';
+      $output .= '<ol>';
+      $output .= '<li>' . t('Have a look at the different settings in Administer » Site configuration » Site map') . '</li>';
+      $output .= '<li>' . t('Visit <a href="@url_site_map">@url_site_map</a>', array('@url_site_map' => url('admin/config/search/sitemap'))) . '</li>';
+      $output .= '</ol>';
+      $output .= '<p>' . t('If you have many books/menus/vocabularies the Checkall module is recommended. It will implement "Check all / Uncheck all" for checkboxes on the site map settings page. http://drupal.org/project/checkall') . '</p>';
+      $output .= '<h3>' . t('Site map term path (and Pathauto)') . '</h3>';
+      $output .= '<p>' . t('There is a "depth" setting on the Site map settings page where you can adjust how site map constructs the term links.') . '</p>';
+      $output .= '<p>' . t('For making Site map build the same path that Pathauto per default generates alias for you should set this to "-1" I believe.') . '</p>';
+      return $output;
+  }
+}
+      
+
+/**
  * Implements hook_permission().
  */
 function site_map_permission() {
