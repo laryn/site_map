@@ -117,7 +117,7 @@ function _site_map_title($default = NULL) {
  */
 function site_map_block_info() {
   $block['syndicate']['info'] = t('Syndicate (site map)');
-  
+
   // Do no caching because $feedurl is different for blogs.
   // @codingStandardsIgnoreLine
   $blocks['syndicate']['cache'] = DRUPAL_NO_CACHE;
