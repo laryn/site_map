@@ -83,7 +83,7 @@ function theme_site_map_feed_icon($variables) {
   switch ($variables['type']) {
     case 'node':
       $output = theme('image', array(
-        'path' => drupal_get_path('module', 'site_map') . '/feed-small.png',
+        'path' => drupal_get_path('module', 'site_map') . '/images/feed-small.png',
         'alt' => t('Syndicated feed icon'),
       )
       );
@@ -91,7 +91,7 @@ function theme_site_map_feed_icon($variables) {
 
     case 'comment':
       $output = theme('image', array(
-        'path' => drupal_get_path('module', 'site_map') . '/feed-small-comment.png',
+        'path' => drupal_get_path('module', 'site_map') . '/images/feed-small-comment.png',
         'alt' => t('Syndicated feed icon'),
       )
       );
