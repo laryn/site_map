@@ -118,7 +118,7 @@ function site_map_menu() {
     'access arguments' => array('administer site map'),
     'file' => 'includes/site_map.admin.inc',
   );
-  $items['sitemap'] = array(
+  $items[variable_get('site_map_path', 'sitemap')] = array(
     'title callback' => '_site_map_title',
     'description' => 'Display a site map with RSS feeds.',
     'page callback' => 'site_map_page',
@@ -142,6 +142,7 @@ function _site_map_title($default = NULL) {
   // If there's a variable set, overriding the translatable title, use it.
   // Otherwise, use the built-in one or one of its translations.
   $var = variable_get('site_map_page_title', '');
+  // @codingStandardsIgnoreLine
   return (strlen($var)) ? t($var) : t('Site map');
 }
 

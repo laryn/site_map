@@ -13,6 +13,8 @@
  */
 function site_map_admin_settings_form() {
 
+  $site_map_patch = variable_get('site_map_path', 'sitemap');
+
   // Field to set site map page title.
   $form['site_map_page_title'] = array(
     '#type' => 'textfield',
@@ -21,11 +23,20 @@ function site_map_admin_settings_form() {
     '#description' => t(
       'Page title that will be used on the <a href="@link">site map page</a>. Leave blank for the default "Site map" in English. It will be available for translation in the <a href="@translation">translation interface</a> (after loading the site map page in another language) unless you override it here. After changing it, it will be necessary to wait for all caches to clear, or they will have to be cleared manually.',
       array(
-        '@link' => url('sitemap'),
+        '@link' => url($site_map_patch),
         '@translation' => url('admin/config/regional/translate/translate'),
       )
     ),
   );
+
+  // Field to set site map page title.
+  $form['site_map_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Page path'),
+    '#default_value' => variable_get('site_map_path', 'sitemap'),
+    '#description' => t('The path for the sitemap'),
+  );
+
   // Field to set site map message.
   $site_map_message = variable_get('site_map_message', array('value' => '', 'format' => NULL));
   $form['site_map_message'] = array(
@@ -248,5 +259,17 @@ function site_map_admin_settings_form() {
     $form['site_map_content']['site_map_show_vocabularies']['#checkall'] = TRUE;
   }
 
-  return system_settings_form($form);
+  $form = system_settings_form($form);
+  $form['#submit'][] = 'site_map_admin_settings_form_submit';
+
+  return $form;
+}
+
+/**
+ * Custom submit handler for the Site Map Admin Settings form.
+ */
+function site_map_admin_settings_form_submit($form, &$form_state) {
+  // Since we allow the user to choose the path of their sitemap, we need to
+  // refresh router entries.
+  menu_rebuild();
 }
