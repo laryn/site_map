@@ -40,7 +40,6 @@ function site_map_help($path, $arg) {
       return $output;
   }
 }
-      
 
 /**
  * Implements hook_permission().
@@ -143,7 +142,7 @@ function _site_map_title($default = NULL) {
   // If there's a variable set, overriding the translatable title, use it.
   // Otherwise, use the built-in one or one of its translations.
   $var = variable_get('site_map_page_title', '');
-  return (strlen($var)) ? $var : t('Site map');
+  return (strlen($var)) ? t($var) : t('Site map');
 }
 
 /**
