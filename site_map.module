@@ -1,45 +1,8 @@
 <?php
-
 /**
  * @file
- * site_map.module
- *
- * Original author: Nic Ivy
- * Now maintained by Fredrik Jonsson fredrik at combonet dot se.
+ * Generates and displays a site map.
  */
-
-/**
- * Implements hook_help().
- */
-function site_map_help($path, $arg) {
-
-  switch ($path) {
-    case 'admin/help#site_map':
-      $output = '<h3>' . t('About') . '</h3>';
-      $output .= '<p>' . t('Site Map provides a site map that gives visitors an overview of your site. It can also display the RSS feeds for all blogs and terms. Drupal generates the RSS feeds automatically but few seems to be aware that they exist.') . '</p>';
-      $output .= '<p>' . t('The site map can display the following items:') . '</p>';
-      $output .= '<ul>';
-      $output .= '<li>' . t('A message to be displayed above the site map') . '</li>';
-      $output .= '<li>' . t('The front page.') . '</li>';
-      $output .= '<li>' . t('The latest blogs.') . '</li>';
-      $output .= '<li>' . t('Any books that optionally will be displayed fully expanded.') . '</li>';
-      $output .= '<li>' . t('Any menus that will be displayed fully expanded.') . '</li>';
-      $output .= '<li>' . t('Any vocabulary with all the terms expanded. Optionally with node counts and RSS feeds.') . '</li>';
-      $output .= '<li>' . t('Display comment RSS links if the Comment RSS module is installed.') . '</li>';
-      $output .= '<li>' . t('A syndication block, the "more" link goes to the site map.') . '</li>';
-      $output .= '</ul>';
-      $output .= '<h3>' . t('Usage') . '</h3>';
-      $output .= '<ol>';
-      $output .= '<li>' . t('Have a look at the different settings in Administer » Site configuration » Site map') . '</li>';
-      $output .= '<li>' . t('Visit <a href="@url_site_map">@url_site_map</a>', array('@url_site_map' => url('admin/config/search/sitemap'))) . '</li>';
-      $output .= '</ol>';
-      $output .= '<p>' . t('If you have many books/menus/vocabularies the Checkall module is recommended. It will implement "Check all / Uncheck all" for checkboxes on the site map settings page. http://drupal.org/project/checkall') . '</p>';
-      $output .= '<h3>' . t('Site map term path (and Pathauto)') . '</h3>';
-      $output .= '<p>' . t('There is a "depth" setting on the Site map settings page where you can adjust how site map constructs the term links.') . '</p>';
-      $output .= '<p>' . t('For making Site map build the same path that Pathauto per default generates alias for you should set this to "-1" I believe.') . '</p>';
-      return $output;
-  }
-}
 
 /**
  * Implements hook_permission().
@@ -73,7 +36,7 @@ function site_map_theme() {
         'additional' => NULL,
       ),
       'template' => 'site-map',
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_box' => array(
       'variables' => array(
@@ -81,27 +44,27 @@ function site_map_theme() {
         'content' => NULL,
         'attributes' => array(),
       ),
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_feed_icon' => array(
       'variables' => array('url' => NULL, 'name' => NULL, 'type' => 'node'),
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_menu_link' => array(
       'render element' => 'element',
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_menu_tree' => array(
       'render element' => 'tree',
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_rss_legend' => array(
       'variables' => array(),
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
     'site_map_order' => array(
       'render element' => 'element',
-      'file' => 'includes/site_map.theme.inc',
+      'file' => 'site_map.theme.inc',
     ),
   );
 }
@@ -113,10 +76,10 @@ function site_map_menu() {
   $items['admin/config/search/sitemap'] = array(
     'title' => 'Site map',
     'description' => 'Control what should be displayed on the site map.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('site_map_admin_settings_form'),
     'access arguments' => array('administer site map'),
-    'file' => 'includes/site_map.admin.inc',
+    'file' => 'site_map.admin.inc',
   );
   $items[variable_get('site_map_path', 'sitemap')] = array(
     'title callback' => '_site_map_title',
@@ -199,7 +162,7 @@ function site_map_block_view($delta = '') {
  * Menu callback for the site map.
  */
 function site_map_page() {
-  drupal_set_title(_site_map_title());
+  backdrop_set_title(_site_map_title());
 
   return site_map_content();
 }
@@ -209,7 +172,7 @@ function site_map_page() {
  */
 function site_map_content() {
   if (variable_get('site_map_css', 0) != 1) {
-    drupal_add_css(drupal_get_path('module', 'site_map') . '/styles/site_map.theme.css');
+    backdrop_add_css(backdrop_get_path('module', 'site_map') . '/css/site_map.theme.css');
   }
 
   return theme('site_map');
@@ -446,7 +409,7 @@ function _site_map_books() {
         }
         if ($books_expanded) {
           $tree_output = _site_map_menu_tree_output($tree);
-          $output .= drupal_render($tree_output);
+          $output .= backdrop_render($tree_output);
         }
         else {
           $data = array_shift($tree);
@@ -497,10 +460,10 @@ function _site_map_menus($mid) {
     // Add an alter hook so that other modules can manipulate the
     // menu tree prior to rendering.
     $alter_mid = preg_replace('/[^a-z0-9_]+/', '_', $mid);
-    drupal_alter(array('site_map_menu_tree', 'site_map_menu_tree_' . $alter_mid), $tree, $menu);
+    backdrop_alter(array('site_map_menu_tree', 'site_map_menu_tree_' . $alter_mid), $tree, $menu);
 
     $menu_display = _site_map_menu_tree_output($tree);
-    $menu_html = drupal_render($menu_display);
+    $menu_html = backdrop_render($menu_display);
     if (!empty($menu_html)) {
       // @codingStandardsIgnoreLine
       $title = t($menu['title']);
@@ -566,7 +529,7 @@ function _site_map_taxonomys($voc) {
       $voc->name = i18n_taxonomy_vocabulary_name($voc, $GLOBALS['language']->language);
     }
 
-    $output .= _site_map_taxonomy_tree($voc->vid, $voc->name, $voc->description);
+    $output .= _site_map_taxonomy_tree($voc->machine_name, $voc->name, $voc->description);
     _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
   }
 
@@ -576,8 +539,8 @@ function _site_map_taxonomys($voc) {
 /**
  * Render the taxonomy tree.
  *
- * @param string $vid
- *   The results of taxonomy_get_tree() with optional 'count' fields.
+ * @param string $machine_name
+ *   Machine name of the vocabulary.
  * @param string $name
  *   An optional name for the tree. (Default: NULL)
  * @param string $description
@@ -586,11 +549,11 @@ function _site_map_taxonomys($voc) {
  * @return string
  *   A string representing a rendered tree.
  */
-function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
+function _site_map_taxonomy_tree($machine_name, $name = NULL, $description = NULL) {
   $output = '';
   $options = array();
   $class = array();
-  if ($vid == variable_get('forum_nav_vocabulary', '')) {
+  if ($machine_name == variable_get('forum_nav_vocabulary', '')) {
     $title = l($name, 'forum');
     $threshold = variable_get('site_map_forum_threshold', -1);
     $forum_link = TRUE;
@@ -602,7 +565,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     $forum_link = FALSE;
   }
   $title .= (module_exists('commentrss') && variable_get('commentrss_term', FALSE) ? ' ' . theme('site_map_feed_icon', array(
-    'url' => "crss/vocab/$vid",
+    'url' => "crss/vocab/$machine_name",
     'name' => check_plain($name),
     'type' => 'comment',
   )) : '');
@@ -622,17 +585,16 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   // Get the tree in a form that respects access control and translations.
   if (module_exists('i18n_taxonomy')) {
     // Taxonomy Translation.
-    $tree = i18n_taxonomy_get_tree($vid, $GLOBALS['language']->language, 0, $site_map_categories_depth);
+    $tree = i18n_taxonomy_get_tree($machine_name, $GLOBALS['language']->language, 0, $site_map_categories_depth);
   }
   elseif (module_exists('entity_translation')) {
-    // Entity Translation.
     // Setting the last parameter has performance implications, but adds
     // proper translation support: https://www.drupal.org/node/2418629.
-    $tree = taxonomy_get_tree($vid, 0, $site_map_categories_depth, TRUE);
+    $tree = taxonomy_get_tree($machine_name, 0, $site_map_categories_depth, TRUE);
   }
   else {
     // If we don't care about translation, there's no need to lose performance.
-    $tree = taxonomy_get_tree($vid, 0, $site_map_categories_depth);
+    $tree = taxonomy_get_tree($machine_name, 0, $site_map_categories_depth);
   }
 
   foreach ($tree as $term) {
@@ -695,7 +657,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
     }
 
     // Add an alter hook for modules to manipulate the taxonomy term output.
-    drupal_alter(array('site_map_taxonomy_term', 'site_map_taxonomy_term_' . $term->tid), $term_item, $term);
+    backdrop_alter(array('site_map_taxonomy_term', 'site_map_taxonomy_term_' . $term->tid), $term_item, $term);
 
     $output .= $term_item;
 
@@ -712,7 +674,7 @@ function _site_map_taxonomy_tree($vid, $name = NULL, $description = NULL) {
   _site_map_set_option($options, 'site_map_show_titles', 1, 1, 'show_titles', TRUE);
 
   $class[] = 'site-map-box-terms';
-  $class[] = 'site-map-box-terms-' . $vid;
+  $class[] = 'site-map-box-terms-' . $machine_name;
   $attributes = array('class' => $class);
 
   $output = theme('site_map_box', array(
@@ -765,7 +727,7 @@ function site_map_taxonomy_term_count_nodes($tid) {
  *   A data structure representing the tree as returned from menu_tree_data.
  *
  * @return array
- *   A structured array to be rendered by drupal_render().
+ *   A structured array to be rendered by backdrop_render().
  *
  * @codingStandardsIgnoreStart
  */
@@ -776,7 +738,6 @@ function _site_map_menu_tree_output($tree) {
 
   // Pull out just the menu links we are going to render so that we
   // get an accurate count for the first/last classes.
-  // Thanks for fix by zhuber at https://drupal.org/node/1331104#comment-5200266
   foreach ($tree as $data) {
     if ($data['link']['access'] && (!$data['link']['hidden'] || variable_get('site_map_show_menus_hidden', 0))) {
       $items[] = $data;
@@ -844,7 +805,7 @@ function _site_map_menu_tree_output($tree) {
     $build[$data['link']['mlid']] = $element;
   }
   if ($build) {
-    // Make sure drupal_render() does not re-order the links.
+    // Make sure backdrop_render() does not re-order the links.
     $build['#sorted'] = TRUE;
     // Add the theme wrapper for outer markup.
     // Allow menu-specific theme overrides.

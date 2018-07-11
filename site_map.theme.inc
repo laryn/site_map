@@ -1,9 +1,6 @@
 <?php
-
 /**
  * @file
- * site_map.theme.inc
- *
  * Site map theme functions.
  */
 
@@ -49,7 +46,7 @@ function theme_site_map_box($variables) {
 
   $output = '';
   if (!empty($title) || !empty($content)) {
-    $output .= '<div' . drupal_attributes($attributes) . '>';
+    $output .= '<div' . backdrop_attributes($attributes) . '>';
     if (!empty($title) && isset($options['show_titles'])) {
       $output .= '<h2 class="title">' . $title . '</h2>';
     }
@@ -83,7 +80,7 @@ function theme_site_map_feed_icon($variables) {
   switch ($variables['type']) {
     case 'node':
       $output = theme('image', array(
-        'path' => drupal_get_path('module', 'site_map') . '/images/feed-small.png',
+        'path' => backdrop_get_path('module', 'site_map') . '/images/feed-small.png',
         'alt' => t('Syndicated feed icon'),
       )
       );
@@ -91,7 +88,7 @@ function theme_site_map_feed_icon($variables) {
 
     case 'comment':
       $output = theme('image', array(
-        'path' => drupal_get_path('module', 'site_map') . '/images/feed-small-comment.png',
+        'path' => backdrop_get_path('module', 'site_map') . '/images/feed-small-comment.png',
         'alt' => t('Syndicated feed icon'),
       )
       );
@@ -167,10 +164,10 @@ function theme_site_map_menu_link(array $variables) {
   $sub_menu = '';
 
   if ($element['#below']) {
-    $sub_menu = drupal_render($element['#below']);
+    $sub_menu = backdrop_render($element['#below']);
   }
   $output = l($element['#title'], $element['#href'], $element['#localized_options']);
-  return '<li' . drupal_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
+  return '<li' . backdrop_attributes($element['#attributes']) . '>' . $output . $sub_menu . "</li>\n";
 }
 
 /**
@@ -229,7 +226,7 @@ function template_preprocess_site_map(&$variables) {
         // Get the list of menus we'll be displaying.
         $menus = variable_get('site_map_show_menus', array());
         // Allow other modules to alter it.
-        drupal_alter('site_map_menu_list', $menus);
+        backdrop_alter('site_map_menu_list', $menus);
         if (!empty($menus[$id])) {
           $variables['site_map'] .= _site_map_menus($id);
         }
@@ -281,18 +278,18 @@ function theme_site_map_order($variables) {
     $element[$name]['weight']['#attributes']['class'][] = 'site-map-order-weight';
     $rows[] = array(
       'data' => array(
-        drupal_render($element[$name]['content']),
-        drupal_render($element[$name]['weight']),
+        backdrop_render($element[$name]['content']),
+        backdrop_render($element[$name]['weight']),
       ),
       'class' => array('draggable'),
     );
   }
-  $output = drupal_render_children($element);
+  $output = backdrop_render_children($element);
   $output .= theme('table', array(
     'rows' => $rows,
     'attributes' => array('id' => 'site-map-order'),
   ));
-  drupal_add_tabledrag('site-map-order', 'order', 'sibling', 'site-map-order-weight', NULL, NULL, TRUE);
+  backdrop_add_tabledrag('site-map-order', 'order', 'sibling', 'site-map-order-weight', NULL, NULL, TRUE);
 
   return $output;
 }

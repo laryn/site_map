@@ -1,0 +1,5 @@
+[SiteMapTest]
+name = Site map
+description = Tests main module logic
+group = Sitemap
+file = tests/site_map.test

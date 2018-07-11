@@ -1,11 +1,7 @@
 <?php
-
 /**
  * @file
  * Admin functions.
- *
- * Original author: Nic Ivy
- * Now maintained by by Fredrik Jonsson fredrik at combonet dot se.
  */
 
 /**
@@ -112,7 +108,6 @@ function site_map_admin_settings_form() {
     '#options' => $menu_options,
     '#multiple' => TRUE,
   );
-  // Thanks for fix by zhuber at https://drupal.org/node/1331104#comment-5200266
   $form['site_map_content']['site_map_show_menus_hidden'] = array(
     '#type' => 'checkbox',
     '#title' => t('Show disabled menu items'),
@@ -164,7 +159,7 @@ function site_map_admin_settings_form() {
       '#weight' => isset($site_map_order_defaults[$content_id]) ? $site_map_order_defaults[$content_id] : -50,
     );
   }
-  $form['#attached']['js'][] = drupal_get_path('module', 'site_map') . '/js/site_map.admin.js';
+  $form['#attached']['js'][] = backdrop_get_path('module', 'site_map') . '/js/site_map.admin.js';
 
   $form['site_map_taxonomy_options'] = array(
     '#type' => 'fieldset',

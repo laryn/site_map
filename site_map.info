@@ -1,6 +1,8 @@
-name = Site map
-description = Display a site map.
-core = 7.x
+type = module
+name = Site Map
+description = Generates and displays a site map.
+backdrop = 1.x
+
 configure = admin/config/search/sitemap
+
 dependencies[] = menu
-files[] = site_map.test
