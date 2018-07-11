@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Generates and displays a site map.
+ * Generates and displays an automatic site map.
  */
 
 /**
