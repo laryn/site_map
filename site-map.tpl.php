@@ -19,7 +19,7 @@
  * @see template_preprocess_site_map()
  */
 ?>
-<div class="site-map <?php print implode(' ', $classes); ?>">
+<div class="<?php print implode(' ', $classes); ?>">
   <?php if ($message): ?>
     <div class="site-map-message">
       <?php print $message; ?>

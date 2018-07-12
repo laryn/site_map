@@ -1,0 +1,29 @@
+{
+    "_config_name": "site_map.settings",
+    "_module": "site_map",
+    "css": 0,
+    "path": "sitemap",
+    "page_title": "Site map",
+    "message": {
+        "value": "",
+        "format": "2"
+    },
+    "show_front": 1,
+    "show_titles": 1,
+    "show_blogs": 0,
+    "show_books": [],
+    "books_expanded": 1,
+    "show_menus": [],
+    "show_menus_hidden": 0,
+    "show_faq": 0,
+    "show_vocabularies": [],
+    "order": [],
+    "show_description": 1,
+    "show_count": 1,
+    "term_depth": "all",
+    "term_threshold": "0",
+    "forum_threshold": "-1",
+    "rss_front": "rss.xml",
+    "show_rss_links": "1",
+    "rss_depth": "all"
+}

@@ -17,7 +17,7 @@ function theme_site_map_rss_legend() {
 }
 
 /**
- * Preprocesses the variables for theme_site_map_box().
+ * Prepares variables for theme_site_map_box().
  */
 function template_preprocess_site_map_box(&$variables) {
   $variables['attributes']['class'][] = 'site-map-box';
@@ -34,11 +34,8 @@ function template_preprocess_site_map_box(&$variables) {
  *
  * @return string
  *   Returns sitemap display in DIV.
- *
- * @codingStandardsIgnoreStart
  */
 function theme_site_map_box($variables) {
-  // @codingStandardsIgnoreEnd
   $title = $variables['title'];
   $content = $variables['content'];
   $attributes = $variables['attributes'];
@@ -70,11 +67,8 @@ function theme_site_map_box($variables) {
  *
  * @return string
  *   Constructs and returns html with feed image icon.
- *
- * @codingStandardsIgnoreStart
  */
 function theme_site_map_feed_icon($variables) {
-  // @codingStandardsIgnoreEnd
   $output = '';
 
   switch ($variables['type']) {
@@ -109,7 +103,7 @@ function theme_site_map_feed_icon($variables) {
 }
 
 /**
- * Preprocesses the rendered tree for theme_site_map_menu_tree().
+ * Prepares variables for theme_site_map_menu_tree().
  *
  * This is a clone of the core template_preprocess_menu_tree() function
  * with the exception of the site_map specific class name used in the
@@ -136,11 +130,8 @@ function template_preprocess_site_map_menu_tree(&$variables) {
  *
  * @see template_preprocess_menu_tree()
  * @ingroup themeable
- *
- * @codingStandardsIgnoreStart
  */
 function theme_site_map_menu_tree($variables) {
-  // @codingStandardsIgnoreEnd
   return '<ul class="site-map-menu">' . $variables['tree'] . '</ul>';
 }
 
@@ -171,26 +162,25 @@ function theme_site_map_menu_link(array $variables) {
 }
 
 /**
- * Preprocesses the variables for site-map.tpl.php.
+ * Prepares variables for site map templates.
  *
  * @see site-map.tpl.php
  */
 function template_preprocess_site_map(&$variables) {
-  $message = variable_get('site_map_message', array());
+  $config = config('site_map.settings');
+  $message = $config->get('message');
   if (!empty($message)) {
     $variables['message'] = check_markup($message['value'], $message['format']);
   }
 
-  if ((variable_get('site_map_show_rss_links', 1) != 0) && module_exists('commentrss') && variable_get('commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
+  if (($config->get('show_rss_links', 1) != 0) && module_exists('commentrss')
+      && config_get('commentrss.settings', 'commentrss_site', COMMENTRSS_SITE_FRONT_PAGE)) {
     $variables['rss_legend'] = theme('site_map_rss_legend');
   }
 
-  if (variable_get('site_map_show_titles', 1)) {
-    $variables['show_titles'] = TRUE;
-  }
-
+  $variables['show_titles'] = $config->get('show_titles');
   $variables['site_map'] = '';
-  $site_map_order = variable_get('site_map_order', array());
+  $site_map_order = $config->get('order');
   asort($site_map_order);
 
   foreach ($site_map_order as $content => $weight) {
@@ -204,19 +194,19 @@ function template_preprocess_site_map(&$variables) {
 
     switch ($type) {
       case 'front':
-        if (variable_get('site_map_show_front', 1)) {
+        if ($config->get('show_front')) {
           $variables['site_map'] .= _site_map_front_page();
         }
         break;
 
       case 'blogs':
-        if (variable_get('site_map_show_blogs', 1)) {
+        if ($config->get('show_blogs')) {
           $variables['site_map'] .= _site_map_blogs();
         }
         break;
 
       case 'books':
-        $books = variable_get('site_map_show_books', array());
+        $books = $config->get('show_books');
         if (!empty($books)) {
           $variables['site_map'] .= _site_map_books();
         }
@@ -224,7 +214,7 @@ function template_preprocess_site_map(&$variables) {
 
       case 'menus':
         // Get the list of menus we'll be displaying.
-        $menus = variable_get('site_map_show_menus', array());
+        $menus = $config->get('show_menus');
         // Allow other modules to alter it.
         backdrop_alter('site_map_menu_list', $menus);
         if (!empty($menus[$id])) {
@@ -233,14 +223,14 @@ function template_preprocess_site_map(&$variables) {
         break;
 
       case 'faq':
-        if (variable_get('site_map_show_faq', 0)) {
+        if ($config->get('show_faq')) {
           $variables['site_map'] .= _site_map_faq();
         }
         break;
 
       case 'vocabularies':
         $vocabulary = taxonomy_vocabulary_machine_name_load($id);
-        $vocabularies = variable_get('site_map_show_vocabularies', array());
+        $vocabularies = $config->get('show_vocabularies');
         if (!empty($vocabularies[$vocabulary->machine_name])) {
           $variables['site_map'] .= _site_map_taxonomys($vocabulary);
         }
@@ -265,11 +255,8 @@ function template_preprocess_site_map(&$variables) {
  *   - element: A render element representing the form.
  *
  * @ingroup themeable
- *
- * @codingStandardsIgnoreStart
  */
 function theme_site_map_order($variables) {
-  // @codingStandardsIgnoreEnd
   $element = $variables['element'];
 
   // Site map order (tabledrag).

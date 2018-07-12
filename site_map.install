@@ -10,3 +10,62 @@
 function site_map_update_last_removed() {
   return 7003;
 }
+
+/**
+ * Implements hook_update_N(). Converts from variables to config.
+ */
+function site_map_update_1000() {
+  // Create the new config file.
+  $config = config('site_map.settings');
+
+  // Set the new config values.
+  $config->set('css', update_variable_get('site_map_css', 0));
+  $config->set('path', update_variable_get('site_map_path', 'sitemap'));
+  $config->set('page_title', update_variable_get('site_map_page_title', FALSE));
+  $config->set('message', update_variable_get('site_map_message', array('value' => '', 'format' => NULL)));
+  $config->set('show_front', update_variable_get('site_map_show_front', 1));
+  $config->set('show_titles', update_variable_get('site_map_show_titles', 1));
+  $config->set('show_blogs', update_variable_get('site_map_show_blogs', 1));
+  $config->set('show_books', update_variable_get('site_map_show_books', array()));
+  $config->set('books_expanded', update_variable_get('site_map_books_expanded', 1));
+  $config->set('show_menus', update_variable_get('site_map_show_menus', array()));
+  $config->set('show_menus_hidden', update_variable_get('site_map_show_menus_hidden', 0));
+  $config->set('show_faq', update_variable_get('site_map_show_faq', 0));
+  $config->set('show_vocabularies', update_variable_get('site_map_show_vocabularies', array()));
+  $config->set('order', update_variable_get('site_map_order', array()));
+  $config->set('show_description', update_variable_get('site_map_show_description', 1));
+  $config->set('show_count', update_variable_get('site_map_show_count', 1));
+  $config->set('term_depth', update_variable_get('site_map_categories_depth', 'all'));
+  $config->set('term_threshold', update_variable_get('site_map_term_threshold', 0));
+  $config->set('forum_threshold', update_variable_get('site_map_forum_threshold', -1));
+  $config->set('rss_front', update_variable_get('site_map_rss_front', 'rss.xml'));
+  $config->set('show_rss_links', update_variable_get('site_map_show_rss_links', 1));
+
+  // Save.
+  $config->save();
+
+  // Delete the legacy variables.
+  update_variable_del('site_map_css');
+  update_variable_del('site_map_path');
+  update_variable_del('site_map_page_title');
+  update_variable_del('site_map_message');
+  update_variable_del('site_map_show_front');
+  update_variable_del('site_map_show_titles');
+  update_variable_del('site_map_show_blogs');
+  update_variable_del('site_map_show_books');
+  update_variable_del('site_map_books_expanded');
+  update_variable_del('site_map_show_menus');
+  update_variable_del('site_map_show_menus_hidden');
+  update_variable_del('site_map_show_faq');
+  update_variable_del('site_map_show_vocabularies');
+  update_variable_del('site_map_order');
+  update_variable_del('site_map_show_description');
+  update_variable_del('site_map_show_count');
+  update_variable_del('site_map_categories_depth');
+  update_variable_del('site_map_term_threshold');
+  update_variable_del('site_map_forum_threshold');
+  update_variable_del('site_map_rss_front');
+  update_variable_del('site_map_show_rss_links');
+  // Delete the unused variables.
+  update_variable_del('site_map_rss_depth');
+}
