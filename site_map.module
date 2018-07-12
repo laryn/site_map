@@ -46,7 +46,7 @@ function site_map_theme() {
         'taxonomys' => NULL,
         'additional' => NULL,
       ),
-      'template' => 'site-map',
+      'template' => 'templates/site-map',
       'file' => 'site_map.theme.inc',
     ),
     'site_map_box' => array(
