@@ -8,8 +8,24 @@
  * Menu callback; presents the sitemap settings page.
  */
 function site_map_admin_settings_form() {
+  $abs_base_path = url(base_path(), array('absolute' => TRUE));
+  $site_map_path = variable_get('site_map_path', 'sitemap');
 
-  $site_map_patch = variable_get('site_map_path', 'sitemap');
+  $form['intro'] = array(
+    '#markup' => t(
+      'All settings below will apply to the <a href="@link">site map page</a>.',
+      array('@link' => url($site_map_path))
+    ),
+  );
+
+  // Field to set site map page path.
+  $form['site_map_path'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Site map page URL'),
+    '#default_value' => variable_get('site_map_path', 'sitemap'),
+    '#field_prefix' => $abs_base_path,
+    '#size' => 25,
+  );
 
   // Field to set site map page title.
   $form['site_map_page_title'] = array(
@@ -17,20 +33,16 @@ function site_map_admin_settings_form() {
     '#title' => t('Page title'),
     '#default_value' => variable_get('site_map_page_title', FALSE),
     '#description' => t(
-      'Page title that will be used on the <a href="@link">site map page</a>. Leave blank for the default "Site map" in English. It will be available for translation in the <a href="@translation">translation interface</a> (after loading the site map page in another language) unless you override it here. After changing it, it will be necessary to wait for all caches to clear, or they will have to be cleared manually.',
-      array(
-        '@link' => url($site_map_patch),
-        '@translation' => url('admin/config/regional/translate/translate'),
-      )
+      'Leave blank to use the default value of <em>Site map</em>.',
+      array('@link' => url($site_map_path))
     ),
+    '#attributes' => array('placeholder' => 'Site map'),
   );
 
-  // Field to set site map page title.
-  $form['site_map_path'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Page path'),
-    '#default_value' => variable_get('site_map_path', 'sitemap'),
-    '#description' => t('The path for the sitemap'),
+  $form['site_map_css'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Remove site map styles.'),
+    '#default_value' => variable_get('site_map_css', 0),
   );
 
   // Field to set site map message.
@@ -38,9 +50,8 @@ function site_map_admin_settings_form() {
   $form['site_map_message'] = array(
     '#type' => 'text_format',
     '#format' => isset($site_map_message['format']) ? $site_map_message['format'] : NULL,
-    '#title' => t('Site map message'),
+    '#title' => t('Message to be displayed above the site map'),
     '#default_value' => $site_map_message['value'],
-    '#description' => t('Define a message to be displayed above the site map.'),
   );
 
   $form['site_map_content'] = array(
@@ -48,34 +59,68 @@ function site_map_admin_settings_form() {
     '#title' => t('Site map content'),
   );
   $site_map_ordering = array();
+
   $form['site_map_content']['site_map_show_front'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show front page'),
+    '#title' => t('Include the front page.'),
     '#default_value' => variable_get('site_map_show_front', 1),
-    '#description' => t('When enabled, this option will include the front page in the site map.'),
   );
   $site_map_ordering['front'] = t('Front page');
+
   $form['site_map_content']['site_map_show_titles'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show titles'),
+    '#title' => t('Include section titles.'),
     '#default_value' => variable_get('site_map_show_titles', 1),
-    '#description' => t('When enabled, this option will show titles. Disable to not show section titles.'),
   );
+
   $form['site_map_content']['site_map_show_node_titles'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show page titles instead of menu link titles'),
+    '#title' => t('Use full page titles instead of menu link titles.'),
     '#default_value' => variable_get('site_map_show_node_titles'),
-    '#description' => t('When enabled, this option will show the actual page title instead of the menu link title.'),
   );
-  if (module_exists('blog')) {
-    $form['site_map_content']['site_map_show_blogs'] = array(
-      '#type' => 'checkbox',
-      '#title' => t('Show active blog authors'),
-      '#default_value' => variable_get('site_map_show_blogs', 1),
-      '#description' => t('When enabled, this option will show the 10 most active blog authors.'),
-    );
-    $site_map_ordering['blogs'] = t('Active blog authors');
+
+  $menu_options = menu_get_menus();
+  foreach ($menu_options as $menu_id => $menu_title) {
+    $site_map_ordering['menus_' . $menu_id] = $menu_title;
   }
+  $form['site_map_content']['site_map_show_menus'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Menus to include in the site map:'),
+    '#default_value' => variable_get('site_map_show_menus', array()),
+    '#options' => $menu_options,
+    '#multiple' => TRUE,
+  );
+
+  $form['site_map_content']['site_map_show_menus_hidden'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Show disabled or hidden menu items'),
+    '#default_value' => variable_get('site_map_show_menus_hidden', 0),
+  );
+
+  if (module_exists('faq')) {
+    $form['site_map_content']['site_map_show_faq'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show FAQ module content'),
+      '#default_value' => variable_get('site_map_show_faq', 0),
+    );
+    $site_map_ordering['faq'] = t('FAQ content');
+  }
+
+  $vocab_options = array();
+  if (module_exists('taxonomy')) {
+    foreach (taxonomy_get_vocabularies() as $vocabulary) {
+      $vocab_options[$vocabulary->machine_name] = $vocabulary->name;
+      $site_map_ordering['vocabularies_' . $vocabulary->machine_name] = $vocabulary->name;
+    }
+  }
+  $form['site_map_content']['site_map_show_vocabularies'] = array(
+    '#type' => 'checkboxes',
+    '#title' => t('Categories (taxonomy terms) to include in the site map:'),
+    '#default_value' => variable_get('site_map_show_vocabularies', array()),
+    '#options' => $vocab_options,
+    '#multiple' => TRUE,
+  );
+
   if (module_exists('book')) {
     $book_options = array();
     foreach (book_get_books() as $book) {
@@ -90,53 +135,22 @@ function site_map_admin_settings_form() {
     );
     $form['site_map_content']['site_map_books_expanded'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show books expanded'),
+      '#title' => t('Show all children pages for each book.'),
       '#default_value' => variable_get('site_map_books_expanded', 1),
-      '#description' => t('When enabled, this option will show all children pages for each book.'),
     );
     $site_map_ordering['books'] = t('Books');
   }
 
-  $menu_options = menu_get_menus();
-  foreach ($menu_options as $menu_id => $menu_title) {
-    $site_map_ordering['menus_' . $menu_id] = $menu_title;
-  }
-  $form['site_map_content']['site_map_show_menus'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Menus to include in the site map'),
-    '#default_value' => variable_get('site_map_show_menus', array()),
-    '#options' => $menu_options,
-    '#multiple' => TRUE,
-  );
-  $form['site_map_content']['site_map_show_menus_hidden'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Show disabled menu items'),
-    '#default_value' => variable_get('site_map_show_menus_hidden', 0),
-    '#description' => t('When enabled, hidden menu links will also be shown.'),
-  );
-  if (module_exists('faq')) {
-    $form['site_map_content']['site_map_show_faq'] = array(
+  // @todo remove now that blog is contrib?
+  if (module_exists('blog')) {
+    $form['site_map_content']['site_map_show_blogs'] = array(
       '#type' => 'checkbox',
-      '#title' => t('Show FAQ content'),
-      '#default_value' => variable_get('site_map_show_faq', 0),
-      '#description' => t('When enabled, this option will include the content from the FAQ module in the site map.'),
+      '#title' => t('Show the 10 most active blog authors'),
+      '#default_value' => variable_get('site_map_show_blogs', 1),
     );
-    $site_map_ordering['faq'] = t('FAQ content');
+    $site_map_ordering['blogs'] = t('Active blog authors');
   }
-  $vocab_options = array();
-  if (module_exists('taxonomy')) {
-    foreach (taxonomy_get_vocabularies() as $vocabulary) {
-      $vocab_options[$vocabulary->machine_name] = $vocabulary->name;
-      $site_map_ordering['vocabularies_' . $vocabulary->machine_name] = $vocabulary->name;
-    }
-  }
-  $form['site_map_content']['site_map_show_vocabularies'] = array(
-    '#type' => 'checkboxes',
-    '#title' => t('Categories to include in the site map'),
-    '#default_value' => variable_get('site_map_show_vocabularies', array()),
-    '#options' => $vocab_options,
-    '#multiple' => TRUE,
-  );
+
   $form['site_map_content']['site_map_order'] = array(
     '#type' => 'item',
     '#title' => t('Site map order'),
@@ -167,84 +181,65 @@ function site_map_admin_settings_form() {
   );
   $form['site_map_taxonomy_options']['site_map_show_description'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show category description'),
+    '#title' => t('Show the taxonomy term description.'),
     '#default_value' => variable_get('site_map_show_description', 1),
-    '#description' => t('When enabled, this option will show the category description.'),
   );
   $form['site_map_taxonomy_options']['site_map_show_count'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Show node counts by categories'),
+    '#title' => t('Show the number of nodes for each taxonomy term.'),
     '#default_value' => variable_get('site_map_show_count', 1),
-    '#description' => t('When enabled, this option will show the number of nodes in each taxonomy term.'),
   );
   $form['site_map_taxonomy_options']['site_map_link_empty'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Create links for empty categories'),
+    '#title' => t('Create links for empty categories.'),
     '#default_value' => variable_get('site_map_link_empty', 0),
-    '#description' => t('When enabled, this option will create links even for taxonomy term without any node.'),
   );
   $form['site_map_taxonomy_options']['site_map_categories_depth'] = array(
     '#type' => 'textfield',
-    '#title' => t('Categories depth'),
+    '#title' => t('How many levels of subcategories should be included?'),
     '#default_value' => variable_get('site_map_categories_depth', 'all'),
     '#size' => 3,
     '#maxlength' => 10,
-    '#description' => t('Specify how many levels of subcategories should be included. Enter a positive integer, or "all" to include all levels.'),
+    '#description' => t('Enter a positive number, or "all" to include all levels.'),
   );
   $form['site_map_taxonomy_options']['site_map_term_threshold'] = array(
-    '#type' => 'textfield',
-    '#title' => t('Category count threshold'),
+    '#type' => 'number',
+    '#title' => t('Term count threshold'),
     '#default_value' => variable_get('site_map_term_threshold', 0),
-    '#size' => 3,
-    '#description' => t('Only show categories whose node counts are greater than this threshold. Set to -1 to disable.'),
+    '#min' => -1,
+    '#description' => t('Only taxonomy terms whose node counts are greater than this threshold will be shown. Set to -1 to disable.'),
   );
   $form['site_map_taxonomy_options']['site_map_forum_threshold'] = array(
-    '#type' => 'textfield',
+    '#type' => 'number',
     '#title' => t('Forum count threshold'),
     '#default_value' => variable_get('site_map_forum_threshold', -1),
-    '#size' => 3,
-    '#description' => t('Only show forums whose node counts are greater than this threshold. Set to -1 to disable.'),
+    '#min' => -1,
+    '#description' => t('Only forums whose node counts are greater than this threshold will be shown. Set to -1 to disable.'),
   );
 
   $form['site_map_rss_options'] = array(
     '#type' => 'fieldset',
     '#title' => t('RSS settings'),
   );
+  $form['site_map_rss_options']['site_map_show_rss_links'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Include links to RSS feeds'),
+    '#default_value' => variable_get('site_map_show_rss_links', 1),
+  );
   $form['site_map_rss_options']['site_map_rss_front'] = array(
     '#type' => 'textfield',
-    '#title' => t('RSS feed for front page'),
+    '#title' => t('URL for home page RSS feed'),
     '#default_value' => variable_get('site_map_rss_front', 'rss.xml'),
-    '#description' => t('The RSS feed for the front page, default is rss.xml.'),
-  );
-  $form['site_map_rss_options']['site_map_show_rss_links'] = array(
-    '#type' => 'select',
-    '#title' => t('Include RSS links'),
-    '#default_value' => variable_get('site_map_show_rss_links', 1),
-    '#options' => array(
-      0 => t('None'),
-      1 => t('Include on the right side'),
-      2 => t('Include on the left side'),
-    ),
-    '#description' => t('When enabled, this option will show links to the RSS feeds for each category and blog.'),
+    '#field_prefix' => $abs_base_path,
+    '#attributes' => array('placeholder' => 'rss.xml'),
   );
   $form['site_map_rss_options']['site_map_rss_depth'] = array(
     '#type' => 'textfield',
-    '#title' => t('RSS feed depth'),
+    '#title' => t('How many subcategories should be included in the RSS feed?'),
     '#default_value' => variable_get('site_map_rss_depth', 'all'),
     '#size' => 3,
     '#maxlength' => 10,
-    '#description' => t('Specify how many subcategories should be included in the RSS feed. Enter "all" to include all subcategories or "0" to include no subcategories.'),
-  );
-
-  $form['site_map_css_options'] = array(
-    '#type' => 'fieldset',
-    '#title' => t('CSS settings'),
-  );
-  $form['site_map_css_options']['site_map_css'] = array(
-    '#type' => 'checkbox',
-    '#title' => t('Do not include site map CSS file'),
-    '#default_value' => variable_get('site_map_css', 0),
-    '#description' => t("If you don't want to load the included CSS file you can check this box."),
+    '#description' => t('Enter a positive number, "all" to include all subcategories, or "0" to include no subcategories.'),
   );
 
   // Make use of the Checkall module if it's installed.
